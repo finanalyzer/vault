@@ -1,0 +1,33 @@
+export const en = {
+  login: {
+    title: "Welcome to PassXYZ",
+    subtitle: "Secure password management",
+    email: "Email",
+    password: "Password",
+    rememberMe: "Remember me",
+    forgotPassword: "Forgot password?",
+    login: "Login",
+    or: "or",
+    continueWithCloudflare: "Continue with Cloudflare Access",
+    loading: "Signing in...",
+    error: {
+      emailRequired: "Email is required",
+      emailInvalid: "Please enter a valid email address",
+      passwordRequired: "Password is required",
+      passwordMinLength: "Password must be at least 8 characters",
+      loginFailed: "Login failed. Please check your credentials.",
+    },
+    success: "Login successful!",
+  },
+  common: {
+    cancel: "Cancel",
+    submit: "Submit",
+    save: "Save",
+    delete: "Delete",
+    edit: "Edit",
+    close: "Close",
+    loading: "Loading...",
+    error: "Error",
+    success: "Success",
+  },
+};

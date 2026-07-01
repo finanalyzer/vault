@@ -1,0 +1,33 @@
+export const zh = {
+  login: {
+    title: "欢迎使用 PassXYZ",
+    subtitle: "安全的密码管理",
+    email: "邮箱",
+    password: "密码",
+    rememberMe: "记住我",
+    forgotPassword: "忘记密码？",
+    login: "登录",
+    or: "或",
+    continueWithCloudflare: "使用 Cloudflare Access 登录",
+    loading: "正在登录...",
+    error: {
+      emailRequired: "请输入邮箱",
+      emailInvalid: "请输入有效的邮箱地址",
+      passwordRequired: "请输入密码",
+      passwordMinLength: "密码长度至少为8个字符",
+      loginFailed: "登录失败，请检查您的凭据。",
+    },
+    success: "登录成功！",
+  },
+  common: {
+    cancel: "取消",
+    submit: "提交",
+    save: "保存",
+    delete: "删除",
+    edit: "编辑",
+    close: "关闭",
+    loading: "加载中...",
+    error: "错误",
+    success: "成功",
+  },
+};
