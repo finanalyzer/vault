@@ -1,58 +1,57 @@
-import axios from 'axios';
-import { getApiBaseUrl } from '../utils/environment';
+import apiClient from './apiClient';
+import type { LoginRequest } from '../types/api';
+import type { LoginResponse } from '../types/api';
+import type { UserProfileDto } from '../types/api';
+import type { SignUpRequest } from '../types/api';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
+import type { UpdateProfileRequest } from '../types/api';
+
+export async function login(request: LoginRequest): Promise<LoginResponse> {
+  const response = await apiClient.post<LoginResponse>('/user/login', request);
+  return response.data;
 }
 
-export interface LoginResponse {
-  success: boolean;
-  token?: string;
-  message?: string;
+export async function signUp(request: SignUpRequest): Promise<UserProfileDto> {
+  const response = await apiClient.post<UserProfileDto>('/user/signup', request);
+  return response.data;
 }
 
-const apiClient = axios.create({
-  baseURL: getApiBaseUrl(),
-  timeout: 10000,
-});
-
-export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
+export async function getUserByEmail(email: string): Promise<UserProfileDto | null> {
   try {
-    const response = await apiClient.post('/auth/login', credentials);
-    
-    if (credentials.rememberMe) {
-      localStorage.setItem('passxyz-email', credentials.email);
-      localStorage.setItem('passxyz-remember-me', 'true');
-    } else {
-      localStorage.removeItem('passxyz-email');
-      localStorage.removeItem('passxyz-remember-me');
-    }
-
+    const response = await apiClient.get<UserProfileDto>(`/user/by-email?email=${encodeURIComponent(email)}`);
     return response.data;
-  } catch (error) {
-    return {
-      success: false,
-      message: 'Login failed. Please check your credentials.',
-    };
+  } catch {
+    return null;
   }
 }
 
-export function getSavedEmail(): string | null {
-  const rememberMe = localStorage.getItem('passxyz-remember-me');
-  if (rememberMe === 'true') {
-    return localStorage.getItem('passxyz-email');
-  }
-  return null;
+export async function getUserProfile(): Promise<UserProfileDto> {
+  const response = await apiClient.get<UserProfileDto>('/user/profile');
+  return response.data;
 }
 
-export function logout(): void {
-  localStorage.removeItem('passxyz-token');
-  localStorage.removeItem('passxyz-email');
-  localStorage.removeItem('passxyz-remember-me');
+export async function updateProfile(request: UpdateProfileRequest): Promise<UserProfileDto> {
+  const response = await apiClient.put<UserProfileDto>('/user/profile', request);
+  return response.data;
 }
 
-export function isAuthenticated(): boolean {
-  return localStorage.getItem('passxyz-token') !== null;
+export async function getUsersList(): Promise<UserProfileDto[]> {
+  const response = await apiClient.get<UserProfileDto[]>('/user/users');
+  return response.data;
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  await apiClient.delete(`/user/${userId}`);
+}
+
+export async function changePassword(oldPassword: string, newPassword: string): Promise<void> {
+  await apiClient.post('/user/change-password', { oldPassword, newPassword });
+}
+
+export async function logout(): Promise<void> {
+  await apiClient.post('/user/logout');
+}
+
+export async function verifySession(): Promise<void> {
+  await apiClient.get('/user/verify-session');
 }

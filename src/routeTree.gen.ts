@@ -9,9 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsersRouteImport } from './routes/users'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VaultIndexRouteImport } from './routes/vault/index'
+import { Route as VaultSettingsRouteImport } from './routes/vault/settings'
+import { Route as VaultSearchRouteImport } from './routes/vault/search'
+import { Route as VaultQrcodeRouteImport } from './routes/vault/qrcode'
+import { Route as VaultOtpRouteImport } from './routes/vault/otp'
+import { Route as VaultIconsRouteImport } from './routes/vault/icons'
+import { Route as VaultAboutRouteImport } from './routes/vault/about'
+import { Route as VaultNotesEntryIdRouteImport } from './routes/vault/notes/$entryId'
+import { Route as VaultNewGroupIdRouteImport } from './routes/vault/new/$groupId'
+import { Route as VaultGroupsGroupIdRouteImport } from './routes/vault/groups/$groupId'
+import { Route as VaultEntriesEntryIdRouteImport } from './routes/vault/entries/$entryId'
+import { Route as VaultPreviewEntryIdAttachmentIdRouteImport } from './routes/vault/preview/$entryId/$attachmentId'
+import { Route as VaultEntriesEntryIdFieldsRouteImport } from './routes/vault/entries/$entryId/fields'
 
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -22,35 +47,227 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VaultIndexRoute = VaultIndexRouteImport.update({
+  id: '/vault/',
+  path: '/vault/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultSettingsRoute = VaultSettingsRouteImport.update({
+  id: '/vault/settings',
+  path: '/vault/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultSearchRoute = VaultSearchRouteImport.update({
+  id: '/vault/search',
+  path: '/vault/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultQrcodeRoute = VaultQrcodeRouteImport.update({
+  id: '/vault/qrcode',
+  path: '/vault/qrcode',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultOtpRoute = VaultOtpRouteImport.update({
+  id: '/vault/otp',
+  path: '/vault/otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultIconsRoute = VaultIconsRouteImport.update({
+  id: '/vault/icons',
+  path: '/vault/icons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultAboutRoute = VaultAboutRouteImport.update({
+  id: '/vault/about',
+  path: '/vault/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultNotesEntryIdRoute = VaultNotesEntryIdRouteImport.update({
+  id: '/vault/notes/$entryId',
+  path: '/vault/notes/$entryId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultNewGroupIdRoute = VaultNewGroupIdRouteImport.update({
+  id: '/vault/new/$groupId',
+  path: '/vault/new/$groupId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultGroupsGroupIdRoute = VaultGroupsGroupIdRouteImport.update({
+  id: '/vault/groups/$groupId',
+  path: '/vault/groups/$groupId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultEntriesEntryIdRoute = VaultEntriesEntryIdRouteImport.update({
+  id: '/vault/entries/$entryId',
+  path: '/vault/entries/$entryId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultPreviewEntryIdAttachmentIdRoute =
+  VaultPreviewEntryIdAttachmentIdRouteImport.update({
+    id: '/vault/preview/$entryId/$attachmentId',
+    path: '/vault/preview/$entryId/$attachmentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const VaultEntriesEntryIdFieldsRoute =
+  VaultEntriesEntryIdFieldsRouteImport.update({
+    id: '/fields',
+    path: '/fields',
+    getParentRoute: () => VaultEntriesEntryIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
+  '/vault/about': typeof VaultAboutRoute
+  '/vault/icons': typeof VaultIconsRoute
+  '/vault/otp': typeof VaultOtpRoute
+  '/vault/qrcode': typeof VaultQrcodeRoute
+  '/vault/search': typeof VaultSearchRoute
+  '/vault/settings': typeof VaultSettingsRoute
+  '/vault/': typeof VaultIndexRoute
+  '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
+  '/vault/new/$groupId': typeof VaultNewGroupIdRoute
+  '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
+  '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
+  '/vault/about': typeof VaultAboutRoute
+  '/vault/icons': typeof VaultIconsRoute
+  '/vault/otp': typeof VaultOtpRoute
+  '/vault/qrcode': typeof VaultQrcodeRoute
+  '/vault/search': typeof VaultSearchRoute
+  '/vault/settings': typeof VaultSettingsRoute
+  '/vault': typeof VaultIndexRoute
+  '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
+  '/vault/new/$groupId': typeof VaultNewGroupIdRoute
+  '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
+  '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
+  '/vault/about': typeof VaultAboutRoute
+  '/vault/icons': typeof VaultIconsRoute
+  '/vault/otp': typeof VaultOtpRoute
+  '/vault/qrcode': typeof VaultQrcodeRoute
+  '/vault/search': typeof VaultSearchRoute
+  '/vault/settings': typeof VaultSettingsRoute
+  '/vault/': typeof VaultIndexRoute
+  '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
+  '/vault/new/$groupId': typeof VaultNewGroupIdRoute
+  '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
+  '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/users'
+    | '/vault/about'
+    | '/vault/icons'
+    | '/vault/otp'
+    | '/vault/qrcode'
+    | '/vault/search'
+    | '/vault/settings'
+    | '/vault/'
+    | '/vault/entries/$entryId'
+    | '/vault/groups/$groupId'
+    | '/vault/new/$groupId'
+    | '/vault/notes/$entryId'
+    | '/vault/entries/$entryId/fields'
+    | '/vault/preview/$entryId/$attachmentId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/users'
+    | '/vault/about'
+    | '/vault/icons'
+    | '/vault/otp'
+    | '/vault/qrcode'
+    | '/vault/search'
+    | '/vault/settings'
+    | '/vault'
+    | '/vault/entries/$entryId'
+    | '/vault/groups/$groupId'
+    | '/vault/new/$groupId'
+    | '/vault/notes/$entryId'
+    | '/vault/entries/$entryId/fields'
+    | '/vault/preview/$entryId/$attachmentId'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/users'
+    | '/vault/about'
+    | '/vault/icons'
+    | '/vault/otp'
+    | '/vault/qrcode'
+    | '/vault/search'
+    | '/vault/settings'
+    | '/vault/'
+    | '/vault/entries/$entryId'
+    | '/vault/groups/$groupId'
+    | '/vault/new/$groupId'
+    | '/vault/notes/$entryId'
+    | '/vault/entries/$entryId/fields'
+    | '/vault/preview/$entryId/$attachmentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  UsersRoute: typeof UsersRoute
+  VaultAboutRoute: typeof VaultAboutRoute
+  VaultIconsRoute: typeof VaultIconsRoute
+  VaultOtpRoute: typeof VaultOtpRoute
+  VaultQrcodeRoute: typeof VaultQrcodeRoute
+  VaultSearchRoute: typeof VaultSearchRoute
+  VaultSettingsRoute: typeof VaultSettingsRoute
+  VaultIndexRoute: typeof VaultIndexRoute
+  VaultEntriesEntryIdRoute: typeof VaultEntriesEntryIdRouteWithChildren
+  VaultGroupsGroupIdRoute: typeof VaultGroupsGroupIdRoute
+  VaultNewGroupIdRoute: typeof VaultNewGroupIdRoute
+  VaultNotesEntryIdRoute: typeof VaultNotesEntryIdRoute
+  VaultPreviewEntryIdAttachmentIdRoute: typeof VaultPreviewEntryIdAttachmentIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -65,12 +282,128 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vault/': {
+      id: '/vault/'
+      path: '/vault'
+      fullPath: '/vault/'
+      preLoaderRoute: typeof VaultIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/settings': {
+      id: '/vault/settings'
+      path: '/vault/settings'
+      fullPath: '/vault/settings'
+      preLoaderRoute: typeof VaultSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/search': {
+      id: '/vault/search'
+      path: '/vault/search'
+      fullPath: '/vault/search'
+      preLoaderRoute: typeof VaultSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/qrcode': {
+      id: '/vault/qrcode'
+      path: '/vault/qrcode'
+      fullPath: '/vault/qrcode'
+      preLoaderRoute: typeof VaultQrcodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/otp': {
+      id: '/vault/otp'
+      path: '/vault/otp'
+      fullPath: '/vault/otp'
+      preLoaderRoute: typeof VaultOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/icons': {
+      id: '/vault/icons'
+      path: '/vault/icons'
+      fullPath: '/vault/icons'
+      preLoaderRoute: typeof VaultIconsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/about': {
+      id: '/vault/about'
+      path: '/vault/about'
+      fullPath: '/vault/about'
+      preLoaderRoute: typeof VaultAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/notes/$entryId': {
+      id: '/vault/notes/$entryId'
+      path: '/vault/notes/$entryId'
+      fullPath: '/vault/notes/$entryId'
+      preLoaderRoute: typeof VaultNotesEntryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/new/$groupId': {
+      id: '/vault/new/$groupId'
+      path: '/vault/new/$groupId'
+      fullPath: '/vault/new/$groupId'
+      preLoaderRoute: typeof VaultNewGroupIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/groups/$groupId': {
+      id: '/vault/groups/$groupId'
+      path: '/vault/groups/$groupId'
+      fullPath: '/vault/groups/$groupId'
+      preLoaderRoute: typeof VaultGroupsGroupIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/entries/$entryId': {
+      id: '/vault/entries/$entryId'
+      path: '/vault/entries/$entryId'
+      fullPath: '/vault/entries/$entryId'
+      preLoaderRoute: typeof VaultEntriesEntryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/preview/$entryId/$attachmentId': {
+      id: '/vault/preview/$entryId/$attachmentId'
+      path: '/vault/preview/$entryId/$attachmentId'
+      fullPath: '/vault/preview/$entryId/$attachmentId'
+      preLoaderRoute: typeof VaultPreviewEntryIdAttachmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/entries/$entryId/fields': {
+      id: '/vault/entries/$entryId/fields'
+      path: '/fields'
+      fullPath: '/vault/entries/$entryId/fields'
+      preLoaderRoute: typeof VaultEntriesEntryIdFieldsRouteImport
+      parentRoute: typeof VaultEntriesEntryIdRoute
+    }
   }
 }
+
+interface VaultEntriesEntryIdRouteChildren {
+  VaultEntriesEntryIdFieldsRoute: typeof VaultEntriesEntryIdFieldsRoute
+}
+
+const VaultEntriesEntryIdRouteChildren: VaultEntriesEntryIdRouteChildren = {
+  VaultEntriesEntryIdFieldsRoute: VaultEntriesEntryIdFieldsRoute,
+}
+
+const VaultEntriesEntryIdRouteWithChildren =
+  VaultEntriesEntryIdRoute._addFileChildren(VaultEntriesEntryIdRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  UsersRoute: UsersRoute,
+  VaultAboutRoute: VaultAboutRoute,
+  VaultIconsRoute: VaultIconsRoute,
+  VaultOtpRoute: VaultOtpRoute,
+  VaultQrcodeRoute: VaultQrcodeRoute,
+  VaultSearchRoute: VaultSearchRoute,
+  VaultSettingsRoute: VaultSettingsRoute,
+  VaultIndexRoute: VaultIndexRoute,
+  VaultEntriesEntryIdRoute: VaultEntriesEntryIdRouteWithChildren,
+  VaultGroupsGroupIdRoute: VaultGroupsGroupIdRoute,
+  VaultNewGroupIdRoute: VaultNewGroupIdRoute,
+  VaultNotesEntryIdRoute: VaultNotesEntryIdRoute,
+  VaultPreviewEntryIdAttachmentIdRoute: VaultPreviewEntryIdAttachmentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,8 +1,12 @@
-import { useTranslation } from "react-i18next";
-import LoginForm from "../components/LoginForm";
+import { useNavigate } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialUsername = searchParams.get('username') || undefined;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-light-100 to-light-200 dark:from-dark-900 dark:to-dark-800">
@@ -17,14 +21,23 @@ export default function LoginPage() {
                 </svg>
               </div>
               <h1 className="text-2xl font-bold text-light-900 dark:text-light-100">
-                {t("login.title")}
+                {t('login.title')}
               </h1>
               <p className="mt-2 text-light-500 dark:text-dark-300">
-                {t("login.subtitle")}
+                {t('login.subtitle')}
               </p>
             </div>
 
-            <LoginForm onSuccess={() => {}} />
+            <LoginForm initialUsername={initialUsername} />
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => navigate({ to: '/signup' })}
+                className="text-brand-main hover:text-brand-darker transition-colors"
+              >
+                {t('signup.alreadyHaveAccount')} {t('signup.login')}
+              </button>
+            </div>
           </div>
         </div>
 
