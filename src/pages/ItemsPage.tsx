@@ -8,7 +8,7 @@ import Sidebar from '../components/layout/Sidebar';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
 
 export default function ItemsPage() {
-  const params = useParams({ from: '/vault/groups/$groupId' });
+  const params = useParams({ strict: false });
   const groupId = params.groupId || 'root';
   const navigate = useNavigate();
   const { t } = useTranslation();

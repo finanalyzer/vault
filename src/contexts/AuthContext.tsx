@@ -21,15 +21,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedUser = localStorage.getItem('passxyz-user');
     
     if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem('passxyz-user');
+        localStorage.removeItem('passxyz-token');
+      }
     }
     setIsLoading(false);
   }, []);
 
   const login = useCallback((token: string, userData: UserProfileDto) => {
+    if (!token) return;
     localStorage.setItem('passxyz-token', token);
-    localStorage.setItem('passxyz-user', JSON.stringify(userData));
-    setUser(userData);
+    if (userData) {
+      localStorage.setItem('passxyz-user', JSON.stringify(userData));
+      setUser(userData);
+    }
   }, []);
 
   const handleLogout = useCallback(async () => {
