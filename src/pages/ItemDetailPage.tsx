@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
-import { getEntry, deleteEntry, getAttachments, downloadAttachment, deleteAttachment } from '../services/vaultService';
+import { getEntry, deleteEntry, getAttachments, downloadAttachment, deleteAttachment, getGroup } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
 import type { AttachmentDto } from '../types/vault';
+import type { GroupDto } from '../types/vault';
 
 import { copyToClipboard } from '../utils/clipboard';
 import Sidebar from '../components/layout/Sidebar';
@@ -22,10 +23,12 @@ export default function ItemDetailPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [rootGroupName, setRootGroupName] = useState<string>('Root');
 
   useEffect(() => {
     loadEntry();
     loadAttachments();
+    loadRootGroupName();
   }, [entryId]);
 
   const loadEntry = async () => {
@@ -46,6 +49,15 @@ export default function ItemDetailPage() {
       setAttachments(data);
     } catch {
       setAttachments([]);
+    }
+  };
+
+  const loadRootGroupName = async () => {
+    try {
+      const rootGroup: GroupDto = await getGroup('root');
+      setRootGroupName(rootGroup.name);
+    } catch {
+      setRootGroupName('Root');
     }
   };
 
@@ -169,7 +181,7 @@ export default function ItemDetailPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {entry.name}
               </h1>
-              <Breadcrumbs groupId="root" />
+              <Breadcrumbs groupId="root" groupName={rootGroupName} rootGroupName={rootGroupName} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@openbb/ui';
-import { getItemsByGroup } from '../services/vaultService';
+import { getItemsByGroup, getGroup } from '../services/vaultService';
 import type { ItemDto } from '../types/vault';
 import { ItemSubType } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -15,16 +15,32 @@ export default function ItemsPage() {
   const { t } = useTranslation();
   const [items, setItems] = useState<ItemDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [groupName, setGroupName] = useState<string>(groupId);
+  const [rootGroupName, setRootGroupName] = useState<string>('Root');
 
   useEffect(() => {
-    loadItems();
+    loadData();
   }, [groupId]);
 
-  const loadItems = async () => {
+  const loadData = async () => {
     setIsLoading(true);
     try {
-      const data = await getItemsByGroup(groupId);
+      const fetchItems = getItemsByGroup(groupId);
+      const fetchGroup = getGroup(groupId);
+      const fetchRootGroup = groupId !== 'root' ? getGroup('root') : Promise.resolve(null);
+      
+      const [data, group, rootGroup] = await Promise.all([
+        fetchItems,
+        fetchGroup,
+        fetchRootGroup,
+      ]);
       setItems(data);
+      setGroupName(group.name);
+      if (rootGroup) {
+        setRootGroupName(rootGroup.name);
+      } else if (groupId === 'root') {
+        setRootGroupName(group.name);
+      }
     } catch {
       setItems([]);
     } finally {
@@ -95,9 +111,9 @@ export default function ItemsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
-                {groupId === 'root' ? 'Root' : groupId}
+                {groupName}
               </h1>
-              <Breadcrumbs groupId={groupId} />
+              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="primary" onClick={handleNewItem}>

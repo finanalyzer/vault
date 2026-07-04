@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Textarea } from '@openbb/ui';
-import { createEntry, createGroup } from '../services/vaultService';
+import { createEntry, createGroup, getGroup } from '../services/vaultService';
 import { ItemSubType } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
@@ -36,6 +36,28 @@ export default function NewItemPage() {
   const [entrySubType, setEntrySubType] = useState<ItemSubType>(ItemSubType.Entry);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [groupName, setGroupName] = useState<string>(groupId || '');
+  const [rootGroupName, setRootGroupName] = useState<string>('Root');
+
+  useEffect(() => {
+    loadGroupNames();
+  }, [groupId]);
+
+  const loadGroupNames = async () => {
+    try {
+      const group = await getGroup(groupId!);
+      setGroupName(group.name);
+      if (groupId !== 'root') {
+        const rootGroup = await getGroup('root');
+        setRootGroupName(rootGroup.name);
+      } else {
+        setRootGroupName(group.name);
+      }
+    } catch {
+      setGroupName(groupId || '');
+      setRootGroupName('Root');
+    }
+  };
 
   const {
     register,
@@ -118,7 +140,7 @@ export default function NewItemPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {t('common.add')}
               </h1>
-              <Breadcrumbs groupId={groupId!} />
+              <Breadcrumbs groupId={groupId!} groupName={groupName} rootGroupName={rootGroupName} />
             </div>
             <Button variant="secondary" onClick={() => navigate({ to: `/vault/groups/${groupId}` })}>
               {t('common.cancel')}

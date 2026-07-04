@@ -2,16 +2,18 @@ import { useNavigate } from '@tanstack/react-router';
 
 interface BreadcrumbsProps {
   groupId: string;
+  groupName: string;
+  rootGroupName: string;
 }
 
-export default function Breadcrumbs({ groupId }: BreadcrumbsProps) {
+export default function Breadcrumbs({ groupId, groupName, rootGroupName }: BreadcrumbsProps) {
   const navigate = useNavigate();
 
   const breadcrumbs = groupId === 'root' 
-    ? [{ id: 'root', name: 'Root' }]
+    ? [{ id: 'root', name: groupName }]
     : [
-        { id: 'root', name: 'Root' },
-        { id: groupId, name: groupId },
+        { id: 'root', name: rootGroupName },
+        { id: groupId, name: groupName },
       ];
 
   return (
