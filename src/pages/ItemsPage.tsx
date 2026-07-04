@@ -17,6 +17,7 @@ export default function ItemsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [groupName, setGroupName] = useState<string>(groupId);
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [rootGroupId, setRootGroupId] = useState<string>('root');
   const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
@@ -39,8 +40,9 @@ export default function ItemsPage() {
       setItems(data);
       setGroupName(group.name);
       setRootGroupName(rootGroup.name);
+      setRootGroupId(rootGroup.id);
       
-      if (groupId !== 'root' && group.parentId && group.parentId !== 'root') {
+      if (groupId !== 'root' && group.parentId && group.parentId !== rootGroup.id) {
         const parent = await getGroup(group.parentId);
         setParentGroup({ id: parent.id, name: parent.name });
       } else {
@@ -118,7 +120,7 @@ export default function ItemsPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {groupName}
               </h1>
-              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
+              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} rootGroupId={rootGroupId} parentGroup={parentGroup} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="primary" onClick={handleNewItem}>

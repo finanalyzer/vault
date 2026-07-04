@@ -24,6 +24,7 @@ export default function ItemDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [rootGroupId, setRootGroupId] = useState<string>('root');
   const [groupName, setGroupName] = useState<string>('');
   const [groupId, setGroupId] = useState<string>('root');
   const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
@@ -46,7 +47,10 @@ export default function ItemDetailPage() {
         const group = await getGroup(data.groupId);
         setGroupName(group.name);
         
-        if (group.parentId && group.parentId !== 'root') {
+        const rootGroup = await getGroup('root');
+        setRootGroupId(rootGroup.id);
+        
+        if (group.parentId && group.parentId !== rootGroup.id) {
           const parent = await getGroup(group.parentId);
           setParentGroup({ id: parent.id, name: parent.name });
         } else {
@@ -198,7 +202,7 @@ export default function ItemDetailPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {entry.name}
               </h1>
-              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
+              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} rootGroupId={rootGroupId} parentGroup={parentGroup} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}>

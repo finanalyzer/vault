@@ -38,6 +38,7 @@ export default function NewItemPage() {
   const [error, setError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>(groupId || '');
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [rootGroupId, setRootGroupId] = useState<string>('root');
   const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
@@ -52,8 +53,9 @@ export default function NewItemPage() {
       
       setGroupName(group.name);
       setRootGroupName(rootGroup.name);
+      setRootGroupId(rootGroup.id);
       
-      if (groupId !== 'root' && group.parentId && group.parentId !== 'root') {
+      if (groupId !== 'root' && group.parentId && group.parentId !== rootGroup.id) {
         const parent = await getGroup(group.parentId);
         setParentGroup({ id: parent.id, name: parent.name });
       } else {
@@ -147,7 +149,7 @@ export default function NewItemPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {t('common.add')}
               </h1>
-              <Breadcrumbs groupId={groupId!} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
+              <Breadcrumbs groupId={groupId!} groupName={groupName} rootGroupName={rootGroupName} rootGroupId={rootGroupId} parentGroup={parentGroup} />
             </div>
             <Button variant="secondary" onClick={() => navigate({ to: `/vault/groups/${groupId}` })}>
               {t('common.cancel')}
