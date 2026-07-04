@@ -15,6 +15,7 @@ export interface ItemDto {
   isGroup: boolean;
   lastModified: string;
   icon?: string;
+  description?: string;
 }
 
 export interface EntryDto extends ItemDto {

@@ -67,10 +67,6 @@ export default function ItemsPage() {
     navigate({ to: `/vault/new/${groupId}` });
   };
 
-  const formatLastModified = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   const getIconForItem = (item: ItemDto) => {
     if (item.isGroup) {
       return (
@@ -169,7 +165,7 @@ export default function ItemsPage() {
                         {item.name}
                       </h3>
                       <p className="text-sm text-light-500 dark:text-dark-400">
-                        {formatLastModified(item.lastModified)}
+                        {item.description || ''}
                       </p>
                     </div>
                     {item.isGroup && (
