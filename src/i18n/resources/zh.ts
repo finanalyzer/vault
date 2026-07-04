@@ -71,6 +71,7 @@ export const zh = {
   common: {
     cancel: "取消",
     submit: "提交",
+    logout: "登出",
     save: "保存",
     delete: "删除",
     edit: "编辑",

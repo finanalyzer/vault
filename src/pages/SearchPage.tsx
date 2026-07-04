@@ -90,7 +90,7 @@ export default function SearchPage() {
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-white dark:bg-dark-800 border-b border-light-200 dark:border-dark-600 px-6 py-4">
+        <header className="bg-white dark:bg-dark-800 border-b border-light-200 dark:border-dark-600 px-6 lg:px-6 py-4 pl-20 lg:pl-6">
           <div className="max-w-3xl mx-auto">
             <Input
               type="text"

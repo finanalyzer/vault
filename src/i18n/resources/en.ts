@@ -71,6 +71,7 @@ export const en = {
   common: {
     cancel: "Cancel",
     submit: "Submit",
+    logout: "Logout",
     save: "Save",
     delete: "Delete",
     edit: "Edit",
