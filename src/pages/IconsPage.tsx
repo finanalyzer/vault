@@ -63,7 +63,6 @@ export default function IconsPage() {
                 value={searchTerm}
                 onChange={(value) => setSearchTerm(String(value))}
                 placeholder={t('common.search') + ' icons...'}
-                icon="search"
               />
             </div>
 

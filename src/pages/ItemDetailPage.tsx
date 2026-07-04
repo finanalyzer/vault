@@ -24,6 +24,9 @@ export default function ItemDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [groupName, setGroupName] = useState<string>('');
+  const [groupId, setGroupId] = useState<string>('root');
+  const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
     loadEntry();
@@ -33,9 +36,23 @@ export default function ItemDetailPage() {
 
   const loadEntry = async () => {
     setIsLoading(true);
+    setParentGroup(undefined);
     try {
       const data = await getEntry(entryId!);
       setEntry(data);
+      
+      if (data.groupId) {
+        setGroupId(data.groupId);
+        const group = await getGroup(data.groupId);
+        setGroupName(group.name);
+        
+        if (group.parentId && group.parentId !== 'root') {
+          const parent = await getGroup(group.parentId);
+          setParentGroup({ id: parent.id, name: parent.name });
+        } else {
+          setParentGroup(undefined);
+        }
+      }
     } catch {
       setEntry(null);
     } finally {
@@ -181,7 +198,7 @@ export default function ItemDetailPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {entry.name}
               </h1>
-              <Breadcrumbs groupId="root" groupName={rootGroupName} rootGroupName={rootGroupName} />
+              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Select, Checkbox } from '@openbb/ui';
@@ -30,10 +30,10 @@ export default function SettingsPage() {
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
@@ -168,7 +168,7 @@ export default function SettingsPage() {
                     </div>
                     <Checkbox
                       checked={isDeviceLockEnabled}
-                      onChange={(checked) => handleUpdateDeviceLock()}
+                      onChange={() => handleUpdateDeviceLock()}
                     />
                   </div>
 
@@ -205,40 +205,61 @@ export default function SettingsPage() {
                 <form onSubmit={handleSubmit(onPasswordSubmit)} className="p-6 space-y-4">
                   <div className="space-y-2">
                     <Label>{t('common.currentPassword')}</Label>
-                    <Input
-                      {...register('currentPassword')}
-                      type="password"
-                      placeholder="••••••••"
-                      disabled={isLoading}
-                      error={!!errors.currentPassword}
-                      message={errors.currentPassword?.message ? t(errors.currentPassword.message as string) : undefined}
-                      revealable
+                    <Controller
+                      name="currentPassword"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                          error={!!errors.currentPassword}
+                          message={errors.currentPassword?.message ? t(errors.currentPassword.message as string) : undefined}
+                          revealable
+                          value={field.value}
+                          onChange={(value) => field.onChange(value)}
+                        />
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>{t('common.newPassword')}</Label>
-                    <Input
-                      {...register('newPassword')}
-                      type="password"
-                      placeholder="••••••••"
-                      disabled={isLoading}
-                      error={!!errors.newPassword}
-                      message={errors.newPassword?.message ? t(errors.newPassword.message as string) : undefined}
-                      revealable
+                    <Controller
+                      name="newPassword"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                          error={!!errors.newPassword}
+                          message={errors.newPassword?.message ? t(errors.newPassword.message as string) : undefined}
+                          revealable
+                          value={field.value}
+                          onChange={(value) => field.onChange(value)}
+                        />
+                      )}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>{t('common.confirmPassword')}</Label>
-                    <Input
-                      {...register('confirmPassword')}
-                      type="password"
-                      placeholder="••••••••"
-                      disabled={isLoading}
-                      error={!!errors.confirmPassword}
-                      message={errors.confirmPassword?.message ? t(errors.confirmPassword.message as string) : undefined}
-                      revealable
+                    <Controller
+                      name="confirmPassword"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                          error={!!errors.confirmPassword}
+                          message={errors.confirmPassword?.message ? t(errors.confirmPassword.message as string) : undefined}
+                          revealable
+                          value={field.value}
+                          onChange={(value) => field.onChange(value)}
+                        />
+                      )}
                     />
                   </div>
 

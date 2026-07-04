@@ -27,11 +27,13 @@ export interface EntryDto extends ItemDto {
   otpUrl?: string;
   customFields?: Record<string, string>;
   attachments?: AttachmentDto[];
+  groupId?: string;
 }
 
 export interface GroupDto extends ItemDto {
   childCount: number;
   children?: ItemDto[];
+  parentId?: string;
 }
 
 export interface NewEntryRequest {

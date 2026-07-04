@@ -17,6 +17,7 @@ export default function ItemsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [groupName, setGroupName] = useState<string>(groupId);
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
     loadData();
@@ -24,10 +25,11 @@ export default function ItemsPage() {
 
   const loadData = async () => {
     setIsLoading(true);
+    setParentGroup(undefined);
     try {
       const fetchItems = getItemsByGroup(groupId);
       const fetchGroup = getGroup(groupId);
-      const fetchRootGroup = groupId !== 'root' ? getGroup('root') : Promise.resolve(null);
+      const fetchRootGroup = getGroup('root');
       
       const [data, group, rootGroup] = await Promise.all([
         fetchItems,
@@ -36,10 +38,13 @@ export default function ItemsPage() {
       ]);
       setItems(data);
       setGroupName(group.name);
-      if (rootGroup) {
-        setRootGroupName(rootGroup.name);
-      } else if (groupId === 'root') {
-        setRootGroupName(group.name);
+      setRootGroupName(rootGroup.name);
+      
+      if (groupId !== 'root' && group.parentId && group.parentId !== 'root') {
+        const parent = await getGroup(group.parentId);
+        setParentGroup({ id: parent.id, name: parent.name });
+      } else {
+        setParentGroup(undefined);
       }
     } catch {
       setItems([]);
@@ -113,7 +118,7 @@ export default function ItemsPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {groupName}
               </h1>
-              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} />
+              <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="primary" onClick={handleNewItem}>

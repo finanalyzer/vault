@@ -97,9 +97,7 @@ export default function SearchPage() {
               value={keyword}
               onChange={(value) => setKeyword(String(value))}
               placeholder={t('common.search') + '...'}
-              icon="search"
               clearable={!!keyword}
-              onClear={() => setKeyword('')}
             />
           </div>
         </header>

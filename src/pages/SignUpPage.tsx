@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Checkbox } from '@openbb/ui';
@@ -33,8 +33,6 @@ type SignUpFormData = z.infer<typeof signupSchema>;
 export default function SignUpPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [signupError, setSignupError] = useState<string>('');
   const [isDeviceLockEnabled, setIsDeviceLockEnabled] = useState(false);
@@ -43,10 +41,10 @@ export default function SignUpPage() {
   const initialEmail = searchParams.get('email') || '';
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -106,58 +104,86 @@ export default function SignUpPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
                 <Label>{t('signup.username')}</Label>
-                <Input
-                  {...register('username')}
-                  type="text"
-                  placeholder="username"
-                  disabled={isLoading}
-                  error={!!errors.username}
-                  message={errors.username?.message ? t(errors.username.message) : undefined}
+                <Controller
+                  name="username"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="text"
+                      placeholder="username"
+                      disabled={isLoading}
+                      error={!!errors.username}
+                      message={errors.username?.message ? t(errors.username.message) : undefined}
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                    />
+                  )}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>{t('signup.email')}</Label>
-                <Input
-                  {...register('email')}
-                  type="email"
-                  placeholder="email@example.com"
-                  disabled={isLoading}
-                  error={!!errors.email}
-                  message={errors.email?.message ? t(errors.email.message) : undefined}
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="email"
+                      placeholder="email@example.com"
+                      disabled={isLoading}
+                      error={!!errors.email}
+                      message={errors.email?.message ? t(errors.email.message) : undefined}
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                    />
+                  )}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>{t('signup.masterPassword')}</Label>
-                <Input
-                  {...register('masterPassword')}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  error={!!errors.masterPassword}
-                  message={errors.masterPassword?.message ? t(errors.masterPassword.message) : undefined}
-                  revealable
+                <Controller
+                  name="masterPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      disabled={isLoading}
+                      error={!!errors.masterPassword}
+                      message={errors.masterPassword?.message ? t(errors.masterPassword.message) : undefined}
+                      revealable
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                    />
+                  )}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>{t('signup.confirmPassword')}</Label>
-                <Input
-                  {...register('confirmPassword')}
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  error={!!errors.confirmPassword}
-                  message={errors.confirmPassword?.message ? t(errors.confirmPassword.message) : undefined}
-                  revealable
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      disabled={isLoading}
+                      error={!!errors.confirmPassword}
+                      message={errors.confirmPassword?.message ? t(errors.confirmPassword.message) : undefined}
+                      revealable
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                    />
+                  )}
                 />
               </div>
 
               <div className="flex items-start gap-3">
                 <Checkbox
                   checked={isDeviceLockEnabled}
-                  onChange={(checked) => setIsDeviceLockEnabled(checked)}
+                  onChange={() => setIsDeviceLockEnabled(!isDeviceLockEnabled)}
                   disabled={isLoading}
                   className="mt-1"
                 />

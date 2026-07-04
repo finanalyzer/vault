@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Textarea } from '@openbb/ui';
@@ -38,31 +38,38 @@ export default function NewItemPage() {
   const [error, setError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>(groupId || '');
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
     loadGroupNames();
   }, [groupId]);
 
   const loadGroupNames = async () => {
+    setParentGroup(undefined);
     try {
       const group = await getGroup(groupId!);
+      const rootGroup = await getGroup('root');
+      
       setGroupName(group.name);
-      if (groupId !== 'root') {
-        const rootGroup = await getGroup('root');
-        setRootGroupName(rootGroup.name);
+      setRootGroupName(rootGroup.name);
+      
+      if (groupId !== 'root' && group.parentId && group.parentId !== 'root') {
+        const parent = await getGroup(group.parentId);
+        setParentGroup({ id: parent.id, name: parent.name });
       } else {
-        setRootGroupName(group.name);
+        setParentGroup(undefined);
       }
     } catch {
       setGroupName(groupId || '');
       setRootGroupName('Root');
+      setParentGroup(undefined);
     }
   };
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<EntryFormData | GroupFormData>({
     resolver: itemType === 'entry' ? zodResolver(entrySchema) : zodResolver(groupSchema),
     defaultValues: {
@@ -140,7 +147,7 @@ export default function NewItemPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {t('common.add')}
               </h1>
-              <Breadcrumbs groupId={groupId!} groupName={groupName} rootGroupName={rootGroupName} />
+              <Breadcrumbs groupId={groupId!} groupName={groupName} rootGroupName={rootGroupName} parentGroup={parentGroup} />
             </div>
             <Button variant="secondary" onClick={() => navigate({ to: `/vault/groups/${groupId}` })}>
               {t('common.cancel')}
@@ -197,37 +204,58 @@ export default function NewItemPage() {
                 )}
 
                 <div className="space-y-2">
-                  <Label>{t('common.name')}</Label>
-                  <Input
-                    {...register('name')}
-                    type="text"
-                    placeholder={t('common.name')}
-                    disabled={isLoading}
-                    error={!!errors.name}
-                    message={errors.name?.message ? t(errors.name.message as string) : undefined}
-                  />
-                </div>
+                <Label>{t('common.name')}</Label>
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="text"
+                      placeholder={t('common.name')}
+                      disabled={isLoading}
+                      error={!!errors.name}
+                      message={errors.name?.message ? t(errors.name.message as string) : undefined}
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                    />
+                  )}
+                />
+              </div>
 
                 {itemType === 'entry' && (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>{t('login.username')}</Label>
-                        <Input
-                          {...register('username')}
-                          type="text"
-                          placeholder="username"
-                          disabled={isLoading}
+                        <Controller
+                          name="username"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              placeholder="username"
+                              disabled={isLoading}
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                            />
+                          )}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label>{t('login.masterPassword')}</Label>
-                        <Input
-                          {...register('password')}
-                          type="password"
-                          placeholder="••••••••"
-                          disabled={isLoading}
-                          revealable
+                        <Controller
+                          name="password"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              disabled={isLoading}
+                              revealable
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                            />
+                          )}
                         />
                       </div>
                     </div>
@@ -235,43 +263,71 @@ export default function NewItemPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>{t('login.email')}</Label>
-                        <Input
-                          {...register('email')}
-                          type="email"
-                          placeholder="email@example.com"
-                          disabled={isLoading}
-                          error={!!(errors as any).email}
-                          message={(errors as any).email?.message ? t((errors as any).email.message as string) : undefined}
+                        <Controller
+                          name="email"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="email"
+                              placeholder="email@example.com"
+                              disabled={isLoading}
+                              error={!!(errors as any).email}
+                              message={(errors as any).email?.message ? t((errors as any).email.message as string) : undefined}
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                            />
+                          )}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label>{t('login.mobile')}</Label>
-                        <Input
-                          {...register('mobile')}
-                          type="tel"
-                          placeholder="+1 234 567 8900"
-                          disabled={isLoading}
+                        <Controller
+                          name="mobile"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="tel"
+                              placeholder="+1 234 567 8900"
+                              disabled={isLoading}
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                            />
+                          )}
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label>{t('login.url')}</Label>
-                      <Input
-                        {...register('url')}
-                        type="url"
-                        placeholder="https://example.com"
-                        disabled={isLoading}
+                      <Controller
+                        name="url"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            type="url"
+                            placeholder="https://example.com"
+                            disabled={isLoading}
+                            value={field.value}
+                            onChange={(value) => field.onChange(value)}
+                          />
+                        )}
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label>{t('common.notes')}</Label>
-                      <Textarea
-                        {...register('notes')}
-                        rows={4}
-                        placeholder="Add notes..."
-                        disabled={isLoading}
+                      <Controller
+                        name="notes"
+                        control={control}
+                        render={({ field }) => (
+                          <Textarea
+                            rows={4}
+                            placeholder="Add notes..."
+                            disabled={isLoading}
+                            value={field.value}
+                            onChange={(value) => field.onChange(value)}
+                          />
+                        )}
                       />
                     </div>
                   </>
