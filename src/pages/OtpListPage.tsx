@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@openbb/ui';
 import { getItemsByGroup } from '../services/vaultService';
 import type { ItemDto } from '../types/vault';
 import type { EntryDto } from '../types/vault';
@@ -152,24 +153,17 @@ export default function OtpListPage() {
                           </p>
                         </div>
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCopy(entry.item.id, entry.otpCode);
                         }}
-                        className="p-2 text-light-400 hover:text-brand-main transition-colors"
+                        className={copiedId === entry.item.id ? 'text-success-500' : 'text-light-400 hover:text-brand-main'}
                       >
-                        {copiedId === entry.item.id ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-success-500">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
-                        )}
-                      </button>
+                        {copiedId === entry.item.id ? 'check' : 'copy'}
+                      </Button>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex-1">

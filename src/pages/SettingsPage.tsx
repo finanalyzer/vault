@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Button, Input, Label, Select, Checkbox } from '@openbb/ui';
 import { getUserProfile, updateProfile } from '../services/authService';
 import { changePassword } from '../services/vaultService';
 
@@ -115,12 +116,9 @@ export default function SettingsPage() {
                 {t('common.settingsHint')}
               </p>
             </div>
-            <button
-              onClick={() => navigate({ to: '/vault' })}
-              className="px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-            >
+            <Button variant="secondary" onClick={() => navigate({ to: '/vault' })}>
               {t('common.close')}
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -135,34 +133,20 @@ export default function SettingsPage() {
             )}
 
             <div className="flex gap-4 mb-6">
-              <button
+              <Button
                 onClick={() => setActiveTab('security')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'security'
-                    ? 'bg-brand-main text-white'
-                    : 'bg-light-100 dark:bg-dark-700 text-light-600 dark:text-light-300 hover:bg-light-200 dark:hover:bg-dark-600'
-                }`}
+                variant={activeTab === 'security' ? 'primary' : 'secondary'}
+                className="flex-1"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
                 {t('common.security')}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveTab('password')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'password'
-                    ? 'bg-brand-main text-white'
-                    : 'bg-light-100 dark:bg-dark-700 text-light-600 dark:text-light-300 hover:bg-light-200 dark:hover:bg-dark-600'
-                }`}
+                variant={activeTab === 'password' ? 'primary' : 'secondary'}
+                className="flex-1"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="5" x2="16" y2="19" />
-                  <line x1="8" y1="5" x2="8" y2="19" />
-                </svg>
                 {t('common.password')}
-              </button>
+              </Button>
             </div>
 
             {activeTab === 'security' && (
@@ -175,41 +159,37 @@ export default function SettingsPage() {
                 <div className="divide-y divide-light-100 dark:divide-dark-700">
                   <div className="flex items-center justify-between px-6 py-4">
                     <div>
-                      <h3 className="font-medium text-light-900 dark:text-light-100">
+                      <Label className="block font-medium text-light-900 dark:text-light-100">
                         {t('common.deviceLock')}
-                      </h3>
+                      </Label>
                       <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
                         {t('common.deviceLockHint')}
                       </p>
                     </div>
-                    <button
-                      onClick={handleUpdateDeviceLock}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        isDeviceLockEnabled ? 'bg-brand-main' : 'bg-light-300 dark:bg-dark-600'
-                      }`}
-                    >
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        isDeviceLockEnabled ? 'translate-x-6' : 'translate-x-1'
-                      }`} />
-                    </button>
+                    <Checkbox
+                      checked={isDeviceLockEnabled}
+                      onChange={(checked) => handleUpdateDeviceLock()}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between px-6 py-4">
                     <div>
-                      <h3 className="font-medium text-light-900 dark:text-light-100">
+                      <Label className="block font-medium text-light-900 dark:text-light-100">
                         {t('common.autoLock')}
-                      </h3>
+                      </Label>
                       <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
                         {t('common.autoLockHint')}
                       </p>
                     </div>
-                    <select className="px-4 py-2 bg-light-50 dark:bg-dark-700 border border-light-300 dark:border-dark-600 rounded-lg text-light-900 dark:text-light-100 focus:outline-none focus:ring-2 focus:ring-brand-main">
-                      <option value="5">{t('common.minutes', { value: 5 })}</option>
-                      <option value="10">{t('common.minutes', { value: 10 })}</option>
-                      <option value="15">{t('common.minutes', { value: 15 })}</option>
-                      <option value="30">{t('common.minutes', { value: 30 })}</option>
-                      <option value="60">{t('common.hours', { value: 1 })}</option>
-                    </select>
+                    <Select
+                      options={[
+                        { value: '5', label: t('common.minutes', { value: 5 }) },
+                        { value: '10', label: t('common.minutes', { value: 10 }) },
+                        { value: '15', label: t('common.minutes', { value: 15 }) },
+                        { value: '30', label: t('common.minutes', { value: 30 }) },
+                        { value: '60', label: t('common.hours', { value: 1 }) },
+                      ]}
+                    />
                   </div>
                 </div>
               </div>
@@ -223,85 +203,55 @@ export default function SettingsPage() {
                   </h2>
                 </div>
                 <form onSubmit={handleSubmit(onPasswordSubmit)} className="p-6 space-y-4">
-                  <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                      {t('common.currentPassword')}
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label>{t('common.currentPassword')}</Label>
+                    <Input
                       {...register('currentPassword')}
                       type="password"
-                      id="currentPassword"
-                      className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main ${
-                        errors.currentPassword
-                          ? 'border-danger-500 focus:ring-danger-500'
-                          : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                      } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
                       placeholder="••••••••"
                       disabled={isLoading}
+                      error={!!errors.currentPassword}
+                      message={errors.currentPassword?.message ? t(errors.currentPassword.message as string) : undefined}
+                      revealable
                     />
-                    {errors.currentPassword && (
-                      <p className="mt-1 text-sm text-danger-500">{t(errors.currentPassword.message as string)}</p>
-                    )}
                   </div>
 
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                      {t('common.newPassword')}
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label>{t('common.newPassword')}</Label>
+                    <Input
                       {...register('newPassword')}
                       type="password"
-                      id="newPassword"
-                      className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main ${
-                        errors.newPassword
-                          ? 'border-danger-500 focus:ring-danger-500'
-                          : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                      } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
                       placeholder="••••••••"
                       disabled={isLoading}
+                      error={!!errors.newPassword}
+                      message={errors.newPassword?.message ? t(errors.newPassword.message as string) : undefined}
+                      revealable
                     />
-                    {errors.newPassword && (
-                      <p className="mt-1 text-sm text-danger-500">{t(errors.newPassword.message as string)}</p>
-                    )}
                   </div>
 
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                      {t('common.confirmPassword')}
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label>{t('common.confirmPassword')}</Label>
+                    <Input
                       {...register('confirmPassword')}
                       type="password"
-                      id="confirmPassword"
-                      className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main ${
-                        errors.confirmPassword
-                          ? 'border-danger-500 focus:ring-danger-500'
-                          : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                      } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
                       placeholder="••••••••"
                       disabled={isLoading}
+                      error={!!errors.confirmPassword}
+                      message={errors.confirmPassword?.message ? t(errors.confirmPassword.message as string) : undefined}
+                      revealable
                     />
-                    {errors.confirmPassword && (
-                      <p className="mt-1 text-sm text-danger-500">{t(errors.confirmPassword.message as string)}</p>
-                    )}
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
+                    size="lg"
+                    className="w-full"
+                    loading={isLoading}
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-main text-white font-medium rounded-lg hover:bg-brand-darker focus:outline-none focus:ring-2 focus:ring-brand-main focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? (
-                      <>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
-                          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                        </svg>
-                        {t('common.loading')}
-                      </>
-                    ) : (
-                      t('common.changePassword')
-                    )}
-                  </button>
+                    {isLoading ? t('common.loading') : t('common.changePassword')}
+                  </Button>
                 </form>
               </div>
             )}

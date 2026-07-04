@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Tag } from '@openbb/ui';
 import { getUsersList, deleteUser, getUserProfile } from '../services/authService';
 import type { UserProfileDto } from '../types/api';
 
@@ -84,12 +85,9 @@ export default function UsersPage() {
                   {t('users.subtitle')}
                 </p>
               </div>
-              <button
-                onClick={() => navigate({ to: '/signup' })}
-                className="px-4 py-2 bg-brand-main text-white rounded-lg hover:bg-brand-darker transition-colors"
-              >
+              <Button variant="primary" onClick={() => navigate({ to: '/signup' })}>
                 {t('common.add')}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -158,13 +156,9 @@ export default function UsersPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.isDeviceLockEnabled
-                            ? 'bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-400'
-                            : 'bg-light-100 text-light-600 dark:bg-dark-600 dark:text-dark-400'
-                        }`}>
+                        <Tag variant={user.isDeviceLockEnabled ? 'success' : 'default'}>
                           {user.isDeviceLockEnabled ? t('common.yes') : t('common.no')}
-                        </span>
+                        </Tag>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -204,35 +198,30 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-dark-800 rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-light-900 dark:text-light-100 mb-2">
-              {t('common.delete')}
-            </h3>
-            <p className="text-light-600 dark:text-light-300 mb-4">
+      <Dialog open={showDeleteConfirm} onOpenChange={() => {
+        setShowDeleteConfirm(false);
+        setSelectedUser(null);
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('common.delete')}</DialogTitle>
+            <p className="text-light-600 dark:text-light-300">
               {t('users.confirmDelete', { username: selectedUser })}
             </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteConfirm(false);
-                  setSelectedUser(null);
-                }}
-                className="flex-1 px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 px-4 py-2 bg-danger-500 text-white rounded-lg hover:bg-danger-600 transition-colors"
-              >
-                {t('common.delete')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => {
+              setShowDeleteConfirm(false);
+              setSelectedUser(null);
+            }}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" onClick={handleDelete}>
+              {t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

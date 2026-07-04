@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
+import { Button } from '@openbb/ui';
 import { getUserProfile } from '../services/authService';
 import type { UserProfileDto } from '../types/api';
 import Sidebar from '../components/layout/Sidebar';
@@ -52,12 +53,9 @@ export default function QrCodePage() {
                 {t('common.deviceLockQR')}
               </p>
             </div>
-            <button
-              onClick={() => navigate({ to: '/vault/settings' })}
-              className="px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-            >
+            <Button variant="secondary" onClick={() => navigate({ to: '/vault/settings' })}>
               {t('common.close')}
-            </button>
+            </Button>
           </div>
         </header>
 

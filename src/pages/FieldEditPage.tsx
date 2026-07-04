@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Button, Input, Label, Checkbox } from '@openbb/ui';
 import { getEntry, updateEntry } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -148,23 +149,12 @@ export default function FieldEditPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate({ to: `/vault/entries/${entryId}` })}
-                className="px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-              >
+              <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}` })}>
                 {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleSave}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-main text-white rounded-lg hover:bg-brand-darker transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+              </Button>
+              <Button variant="primary" onClick={handleSave}>
                 {t('common.save')}
-              </button>
+              </Button>
             </div>
           </div>
         </header>
@@ -185,58 +175,38 @@ export default function FieldEditPage() {
               </div>
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="newFieldKey" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                      {t('common.key')}
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label>{t('common.key')}</Label>
+                    <Input
                       type="text"
-                      id="newFieldKey"
                       value={newFieldKey}
-                      onChange={(e) => setNewFieldKey(e.target.value)}
-                      className="w-full px-4 py-3 border border-light-300 dark:border-dark-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-main focus:border-brand-main bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100"
+                      onChange={(value) => setNewFieldKey(String(value))}
                       placeholder="Field name"
                     />
                   </div>
-                  <div>
-                    <label htmlFor="newFieldValue" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                      {t('common.value')}
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label>{t('common.value')}</Label>
+                    <Input
                       type="text"
-                      id="newFieldValue"
                       value={newFieldValue}
-                      onChange={(e) => setNewFieldValue(e.target.value)}
-                      className="w-full px-4 py-3 border border-light-300 dark:border-dark-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-main focus:border-brand-main bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100"
+                      onChange={(value) => setNewFieldValue(String(value))}
                       placeholder="Field value"
                     />
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="newFieldProtected"
+                  <Checkbox
                     checked={newFieldProtected}
-                    onChange={(e) => setNewFieldProtected(e.target.checked)}
-                    className="w-4 h-4 rounded border-light-300 dark:border-dark-500 bg-light-50 dark:bg-dark-700 text-brand-main focus:ring-brand-main"
+                    onChange={(checked) => setNewFieldProtected(checked)}
                   />
-                  <label htmlFor="newFieldProtected" className="text-sm font-medium text-light-850 dark:text-light-100">
-                    {t('common.protected')}
-                  </label>
+                  <Label>{t('common.protected')}</Label>
                 </div>
                 {error && (
                   <p className="text-sm text-danger-500">{error}</p>
                 )}
-                <button
-                  onClick={handleAddField}
-                  className="flex items-center gap-2 px-4 py-2 bg-brand-main text-white rounded-lg hover:bg-brand-darker transition-colors"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
+                <Button variant="primary" onClick={handleAddField}>
                   {t('common.add')}
-                </button>
+                </Button>
               </div>
             </div>
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Button, Input, Label, Checkbox } from '@openbb/ui';
 import { signUp } from '../services/authService';
 
 const signupSchema = z.object({
@@ -103,145 +104,65 @@ export default function SignUpPage() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                  {t('signup.username')}
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label>{t('signup.username')}</Label>
+                <Input
                   {...register('username')}
                   type="text"
-                  id="username"
-                  className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main ${
-                    errors.username
-                      ? 'border-danger-500 focus:ring-danger-500'
-                      : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                  } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
                   placeholder="username"
                   disabled={isLoading}
+                  error={!!errors.username}
+                  message={errors.username?.message ? t(errors.username.message) : undefined}
                 />
-                {errors.username && errors.username.message && (
-                  <p className="mt-1 text-sm text-danger-500">{t(errors.username.message)}</p>
-                )}
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                  {t('signup.email')}
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label>{t('signup.email')}</Label>
+                <Input
                   {...register('email')}
                   type="email"
-                  id="email"
-                  className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main ${
-                    errors.email
-                      ? 'border-danger-500 focus:ring-danger-500'
-                      : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                  } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
                   placeholder="email@example.com"
                   disabled={isLoading}
+                  error={!!errors.email}
+                  message={errors.email?.message ? t(errors.email.message) : undefined}
                 />
-                {errors.email && errors.email.message && (
-                  <p className="mt-1 text-sm text-danger-500">{t(errors.email.message)}</p>
-                )}
               </div>
 
-              <div>
-                <label htmlFor="masterPassword" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                  {t('signup.masterPassword')}
-                </label>
-                <div className="relative">
-                  <input
-                    {...register('masterPassword')}
-                    type={showPassword ? 'text' : 'password'}
-                    id="masterPassword"
-                    className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main pr-12 ${
-                      errors.masterPassword
-                        ? 'border-danger-500 focus:ring-danger-500'
-                        : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                    } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-light-500 dark:text-dark-300 hover:text-light-700 dark:hover:text-light-200 transition-colors"
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9.87 9.87a3 3 0 1 0 4.26 4.26" />
-                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c1.09 0 2.16-.16 3.16-.46" />
-                      </svg>
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {errors.masterPassword && errors.masterPassword.message && (
-                  <p className="mt-1 text-sm text-danger-500">{t(errors.masterPassword.message)}</p>
-                )}
+              <div className="space-y-2">
+                <Label>{t('signup.masterPassword')}</Label>
+                <Input
+                  {...register('masterPassword')}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  error={!!errors.masterPassword}
+                  message={errors.masterPassword?.message ? t(errors.masterPassword.message) : undefined}
+                  revealable
+                />
               </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-light-850 dark:text-light-100 mb-2">
-                  {t('signup.confirmPassword')}
-                </label>
-                <div className="relative">
-                  <input
-                    {...register('confirmPassword')}
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirmPassword"
-                    className={`w-full px-4 py-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-brand-main pr-12 ${
-                      errors.confirmPassword
-                        ? 'border-danger-500 focus:ring-danger-500'
-                        : 'border-light-300 dark:border-dark-400 focus:border-brand-main'
-                    } bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100`}
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-light-500 dark:text-dark-300 hover:text-light-700 dark:hover:text-light-200 transition-colors"
-                    disabled={isLoading}
-                  >
-                    {showConfirmPassword ? (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9.87 9.87a3 3 0 1 0 4.26 4.26" />
-                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c1.09 0 2.16-.16 3.16-.46" />
-                      </svg>
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {errors.confirmPassword && errors.confirmPassword.message && (
-                  <p className="mt-1 text-sm text-danger-500">{t(errors.confirmPassword.message)}</p>
-                )}
+              <div className="space-y-2">
+                <Label>{t('signup.confirmPassword')}</Label>
+                <Input
+                  {...register('confirmPassword')}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  error={!!errors.confirmPassword}
+                  message={errors.confirmPassword?.message ? t(errors.confirmPassword.message) : undefined}
+                  revealable
+                />
               </div>
 
               <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="deviceLock"
+                <Checkbox
                   checked={isDeviceLockEnabled}
-                  onChange={(e) => setIsDeviceLockEnabled(e.target.checked)}
-                  className="mt-1 w-4 h-4 rounded border-light-300 dark:border-dark-500 bg-light-50 dark:bg-dark-700 text-brand-main focus:ring-brand-main"
+                  onChange={(checked) => setIsDeviceLockEnabled(checked)}
                   disabled={isLoading}
+                  className="mt-1"
                 />
                 <div>
-                  <label htmlFor="deviceLock" className="block text-sm font-medium text-light-850 dark:text-light-100">
-                    {t('signup.deviceLock')}
-                  </label>
+                  <Label className="block">{t('signup.deviceLock')}</Label>
                   <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
                     {t('signup.deviceLockHint')}
                   </p>
@@ -254,31 +175,25 @@ export default function SignUpPage() {
                 </div>
               )}
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full"
+                loading={isLoading}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-main text-white font-medium rounded-lg hover:bg-brand-darker focus:outline-none focus:ring-2 focus:ring-brand-main focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
-                  <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
-                    {t('login.loading')}
-                  </>
-                ) : (
-                  t('signup.createAccount')
-                )}
-              </button>
+                {isLoading ? t('login.loading') : t('signup.createAccount')}
+              </Button>
             </form>
 
             <div className="mt-6 text-center">
-              <button
+              <Button
+                variant="link"
                 onClick={() => navigate({ to: '/login' })}
-                className="text-brand-main hover:text-brand-darker transition-colors"
               >
                 {t('signup.alreadyHaveAccount')} {t('signup.login')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Input } from '@openbb/ui';
 import { searchEntries } from '../services/vaultService';
 import type { ItemDto } from '../types/vault';
 import { ItemSubType } from '../types/vault';
@@ -91,30 +92,15 @@ export default function SearchPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-white dark:bg-dark-800 border-b border-light-200 dark:border-dark-600 px-6 py-4">
           <div className="max-w-3xl mx-auto">
-            <div className="relative">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-light-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder={t('common.search') + '...'}
-                className="w-full pl-12 pr-4 py-3 border border-light-300 dark:border-dark-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-main focus:border-brand-main bg-light-50 dark:bg-dark-700 text-light-900 dark:text-light-100"
-              />
-              {keyword && (
-                <button
-                  onClick={() => setKeyword('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-light-400 hover:text-light-600"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              )}
-            </div>
+            <Input
+              type="text"
+              value={keyword}
+              onChange={(value) => setKeyword(String(value))}
+              placeholder={t('common.search') + '...'}
+              icon="search"
+              clearable={!!keyword}
+              onClear={() => setKeyword('')}
+            />
           </div>
         </header>
 

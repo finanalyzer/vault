@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
 import { getEntry, deleteEntry, getAttachments, downloadAttachment, deleteAttachment } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
 import type { AttachmentDto } from '../types/vault';
@@ -171,27 +172,12 @@ export default function ItemDetailPage() {
               <Breadcrumbs groupId="root" />
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}
-                className="flex items-center gap-2 px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                  <path d="m15 5 4 4" />
-                </svg>
+              <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}>
                 {t('common.edit')}
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-danger-500 text-white rounded-lg hover:bg-danger-600 transition-colors"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 6h18" />
-                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                </svg>
+              </Button>
+              <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
                 {t('common.delete')}
-              </button>
+              </Button>
             </div>
           </div>
         </header>
@@ -394,32 +380,24 @@ export default function ItemDetailPage() {
         </main>
       </div>
 
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-dark-800 rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-light-900 dark:text-light-100 mb-2">
-              {t('common.delete')}
-            </h3>
-            <p className="text-light-600 dark:text-light-300 mb-4">
+      <Dialog open={showDeleteConfirm} onOpenChange={() => setShowDeleteConfirm(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('common.delete')}</DialogTitle>
+            <p className="text-light-600 dark:text-light-300">
               {t('common.confirmDelete', { name: entry.name })}
             </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 px-4 py-2 bg-danger-500 text-white rounded-lg hover:bg-danger-600 transition-colors"
-              >
-                {t('common.delete')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" onClick={handleDelete}>
+              {t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@openbb/ui';
 import { downloadAttachment, getAttachments } from '../services/vaultService';
 import type { AttachmentDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -61,12 +62,9 @@ export default function ImagePreviewPage() {
                 </p>
               )}
             </div>
-            <button
-              onClick={() => navigate({ to: `/vault/entries/${entryId}` })}
-              className="px-4 py-2 border border-light-300 dark:border-dark-600 text-light-700 dark:text-light-300 rounded-lg hover:bg-light-50 dark:hover:bg-dark-700 transition-colors"
-            >
+            <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}` })}>
               {t('common.close')}
-            </button>
+            </Button>
           </div>
         </header>
 
