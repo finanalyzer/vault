@@ -12,7 +12,7 @@ import { routeTree } from "./routeTree.gen";
 const savedTheme = localStorage.getItem("theme") || "dark";
 document.documentElement.classList.toggle("dark", savedTheme === "dark");
 
-Icon.defaultUrl = "/spritemap.svg";
+Icon.defaultUrl = `${import.meta.env.BASE_URL}spritemap.svg`;
 
 const hashHistory = createHashHistory();
 
