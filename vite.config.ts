@@ -40,12 +40,13 @@ export default defineConfig({
       : []),
   ],
   server: {
+    host: "0.0.0.0",
     port: 5173,
     open: false,
     allowedHosts: getApiHostnames(),
     proxy: {
       "/api": {
-        target: env.VITE_API_BASE_URL || "http://localhost:5000",
+        target: "http://localhost:5182",
         changeOrigin: true,
         secure: false,
       },
