@@ -1,17 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@openbb/ui';
-import { getItemsByGroup } from '../services/vaultService';
-import type { ItemDto } from '../types/vault';
+import { getOtpEntries } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
-import { ItemSubType } from '../types/vault';
 import { generateOtp, parseOtpUrl, getOtpRemainingSeconds } from '../utils/totp';
 import { copyToClipboard } from '../utils/clipboard';
 import Sidebar from '../components/layout/Sidebar';
 
 interface OtpEntry {
-  item: ItemDto;
   entry: EntryDto;
   otpCode: string;
   remaining: number;
@@ -25,31 +22,43 @@ export default function OtpListPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const loadOtpEntries = useCallback(async () => {
+    console.log('[OtpListPage] loadOtpEntries called');
     setIsLoading(true);
     try {
-      const items = await getItemsByGroup('root');
-      const entriesWithOtp: OtpEntry[] = [];
+      const entries = await getOtpEntries();
+      console.log('[OtpListPage] API returned entries:', entries.length, JSON.stringify(entries, null, 2));
 
-      for (const item of items) {
-        if (!item.isGroup && (item.type === ItemSubType.Entry || item.type === ItemSubType.PxEntry)) {
-          const response = await fetch(`/api/vault/entries/${item.id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('passxyz-token')}` },
-          });
-          if (response.ok) {
-            const entry: EntryDto = await response.json();
-            if (entry.otpUrl) {
-              const otpData = parseOtpUrl(entry.otpUrl);
-              if (otpData) {
-                const { code, remaining } = generateOtp(otpData.secret);
-                entriesWithOtp.push({ item, entry, otpCode: code, remaining });
-              }
+      const entriesWithOtp: OtpEntry[] = [];
+      let skippedNoOtpUrl = 0;
+      let skippedParseFailed = 0;
+
+      for (const entry of entries) {
+        console.log('[OtpListPage] Processing entry:', entry.name, 'otpUrl:', !!entry.otpUrl);
+        if (entry.otpUrl) {
+          const otpData = parseOtpUrl(entry.otpUrl);
+          console.log('[OtpListPage] parseOtpUrl result:', otpData);
+          if (otpData) {
+            try {
+              const { code, remaining } = await generateOtp(otpData.secret);
+              console.log('[OtpListPage] generateOtp result:', { code, remaining });
+              entriesWithOtp.push({ entry, otpCode: code, remaining });
+            } catch (genErr) {
+              console.error('[OtpListPage] generateOtp error:', genErr);
+              skippedParseFailed++;
             }
+          } else {
+            console.log('[OtpListPage] parseOtpUrl returned null for:', entry.otpUrl);
+            skippedParseFailed++;
           }
+        } else {
+          skippedNoOtpUrl++;
         }
       }
 
+      console.log('[OtpListPage] Final result:', { total: entries.length, withOtp: entriesWithOtp.length, skippedNoOtpUrl, skippedParseFailed });
       setOtpEntries(entriesWithOtp);
-    } catch {
+    } catch (err) {
+      console.error('[OtpListPage] loadOtpEntries error:', err);
       setOtpEntries([]);
     } finally {
       setIsLoading(false);
@@ -60,23 +69,55 @@ export default function OtpListPage() {
     loadOtpEntries();
   }, [loadOtpEntries]);
 
+  const otpEntriesRef = useRef<OtpEntry[]>([]);
+  
+  useEffect(() => {
+    otpEntriesRef.current = otpEntries;
+  }, [otpEntries]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       const remaining = getOtpRemainingSeconds();
-      setOtpEntries(prev => prev.map(entry => {
-        if (remaining !== entry.remaining) {
-          const otpData = parseOtpUrl(entry.entry.otpUrl!);
-          if (otpData) {
-            const { code } = generateOtp(otpData.secret);
-            return { ...entry, otpCode: code, remaining };
-          }
-        }
-        return { ...entry, remaining };
-      }));
+      setOtpEntries(prev => prev.map(entry => ({ ...entry, remaining })));
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (otpEntries.length === 0) return;
+
+    const updateCodes = async () => {
+      const entries = otpEntriesRef.current;
+      const newCodes = await Promise.all(
+        entries.map(async entry => {
+          const otpData = parseOtpUrl(entry.entry.otpUrl!);
+          if (otpData) {
+            const { code } = await generateOtp(otpData.secret);
+            return code;
+          }
+          return entry.otpCode;
+        })
+      );
+
+      setOtpEntries(prev => {
+        return prev.map((entry, index) => ({
+          ...entry,
+          otpCode: newCodes[index],
+          remaining: getOtpRemainingSeconds()
+        }));
+      });
+    };
+
+    const initialDelay = getOtpRemainingSeconds() * 1000;
+    const timeout = setTimeout(() => {
+      updateCodes();
+      const codeInterval = setInterval(updateCodes, 30000);
+      return () => clearInterval(codeInterval);
+    }, initialDelay);
+
+    return () => clearTimeout(timeout);
+  }, [otpEntries.length]);
 
   const handleCopy = async (id: string, code: string) => {
     const success = await copyToClipboard(code);
@@ -86,8 +127,8 @@ export default function OtpListPage() {
     }
   };
 
-  const handleItemClick = (item: ItemDto) => {
-    navigate({ to: `/vault/entries/${item.id}` });
+  const handleItemClick = (entry: EntryDto) => {
+    navigate({ to: `/vault/entries/${entry.id}` });
   };
 
   return (
@@ -131,8 +172,8 @@ export default function OtpListPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {otpEntries.map((entry) => (
                   <div
-                    key={entry.item.id}
-                    onClick={() => handleItemClick(entry.item)}
+                    key={entry.entry.id}
+                    onClick={() => handleItemClick(entry.entry)}
                     className="bg-white dark:bg-dark-800 rounded-xl shadow-light-5 dark:shadow-dark-5 p-6 hover:bg-light-50 dark:hover:bg-dark-700 cursor-pointer transition-colors relative overflow-hidden"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -146,7 +187,7 @@ export default function OtpListPage() {
                         </div>
                         <div>
                           <h3 className="font-semibold text-light-900 dark:text-light-100">
-                            {entry.item.name}
+                            {entry.entry.name}
                           </h3>
                           <p className="text-sm text-light-500 dark:text-dark-400">
                             {entry.entry.username || ''}
@@ -158,11 +199,11 @@ export default function OtpListPage() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCopy(entry.item.id, entry.otpCode);
+                          handleCopy(entry.entry.id, entry.otpCode);
                         }}
-                        className={copiedId === entry.item.id ? 'text-success-500' : 'text-light-400 hover:text-brand-main'}
+                        className={copiedId === entry.entry.id ? 'text-success-500' : 'text-light-400 hover:text-brand-main'}
                       >
-                        {copiedId === entry.item.id ? 'check' : 'copy'}
+                        {copiedId === entry.entry.id ? 'check' : 'copy'}
                       </Button>
                     </div>
                     <div className="flex items-center gap-4">

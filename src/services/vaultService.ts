@@ -32,6 +32,18 @@ export async function searchEntries(keyword: string): Promise<ItemDto[]> {
   return response.data;
 }
 
+export async function getOtpEntries(): Promise<EntryDto[]> {
+  console.log('[vaultService.ts] getOtpEntries called, fetching /vault/otp');
+  try {
+    const response = await apiClient.get<EntryDto[]>('/vault/otp');
+    console.log('[vaultService.ts] getOtpEntries success, status:', response.status, 'data length:', response.data?.length);
+    return response.data;
+  } catch (err) {
+    console.error('[vaultService.ts] getOtpEntries error:', err);
+    throw err;
+  }
+}
+
 export async function getIcons(): Promise<IconDto[]> {
   const response = await apiClient.get<IconDto[]>('/vault/icons');
   return response.data;
