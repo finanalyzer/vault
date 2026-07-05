@@ -59,7 +59,11 @@ export default function ItemsPage() {
     if (item.isGroup) {
       navigate({ to: `/vault/groups/${item.id}` });
     } else {
-      navigate({ to: `/vault/entries/${item.id}` });
+      if (item.type === ItemSubType.Notes) {
+        navigate({ to: `/vault/notes/${item.id}` });
+      } else {
+        navigate({ to: `/vault/entries/${item.id}` });
+      }
     }
   };
 

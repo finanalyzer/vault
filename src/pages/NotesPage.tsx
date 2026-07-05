@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import { Button } from '@openbb/ui';
-import { getEntry } from '../services/vaultService';
+import { getEntry, updateEntry } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
 
@@ -16,10 +16,20 @@ export default function NotesPage() {
   const { t } = useTranslation();
   const [entry, setEntry] = useState<EntryDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNotes, setEditedNotes] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     loadEntry();
   }, [entryId]);
+
+  useEffect(() => {
+    if (entry?.notes !== undefined) {
+      setEditedNotes(entry.notes);
+    }
+  }, [entry]);
 
   const loadEntry = async () => {
     setIsLoading(true);
@@ -30,6 +40,32 @@ export default function NotesPage() {
       setEntry(null);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleStartEdit = () => {
+    setIsEditing(true);
+    setNotification(null);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedNotes(entry?.notes || '');
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateEntry(entryId!, { notes: editedNotes });
+      setEntry(prev => prev ? { ...prev, notes: editedNotes } : null);
+      setIsEditing(false);
+      setNotification({ type: 'success', message: t('common.save') + ' ' + t('common.success') });
+      setTimeout(() => setNotification(null), 3000);
+    } catch {
+      setNotification({ type: 'error', message: t('common.error') });
+      setTimeout(() => setNotification(null), 3000);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -76,17 +112,50 @@ export default function NotesPage() {
                 {t('common.notes')}
               </p>
             </div>
-            <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}` })}>
-              {t('common.close')}
-            </Button>
+            <div className="flex items-center gap-4">
+              {isEditing ? (
+                <>
+                  <Button variant="secondary" onClick={handleCancelEdit}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button variant="primary" onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? t('common.saving') : t('common.save')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="secondary" onClick={handleStartEdit}>
+                    {t('common.edit')}
+                  </Button>
+                  <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}` })}>
+                    {t('common.close')}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
         <main className="flex-1 p-6">
+          {notification && (
+            <div className={`p-4 mb-4 ${notification.type === 'success' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800' : 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800'} border rounded-lg`}>
+              <p className={`text-sm ${notification.type === 'success' ? 'text-success-600 dark:text-success-400' : 'text-danger-600 dark:text-danger-400'}`}>
+                {notification.message}
+              </p>
+            </div>
+          )}
           <div className="max-w-3xl mx-auto">
             <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden">
               <div className="p-8">
-                {entry.notes ? (
+                {isEditing ? (
+                  <textarea
+                    className="w-full h-96 p-4 bg-light-50 dark:bg-dark-700 border border-light-200 dark:border-dark-600 rounded-lg resize-none text-sm text-light-900 dark:text-light-100 font-mono"
+                    value={editedNotes}
+                    onChange={(e) => setEditedNotes(e.target.value)}
+                    placeholder={t('common.noNotes')}
+                    autoFocus
+                  />
+                ) : entry.notes ? (
                   <div className="prose prose-sm max-w-none dark:prose-invert">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
                       {entry.notes}
