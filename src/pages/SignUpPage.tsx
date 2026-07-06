@@ -183,11 +183,11 @@ export default function SignUpPage() {
               <div className="flex items-start gap-3">
                 <Checkbox
                   checked={isDeviceLockEnabled}
-                  onChange={() => setIsDeviceLockEnabled(!isDeviceLockEnabled)}
+                  onCheckedChange={(checked) => setIsDeviceLockEnabled(checked as boolean)}
                   disabled={isLoading}
                   className="mt-1"
                 />
-                <div>
+                <div className="flex flex-col">
                   <Label className="block">{t('signup.deviceLock')}</Label>
                   <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
                     {t('signup.deviceLockHint')}

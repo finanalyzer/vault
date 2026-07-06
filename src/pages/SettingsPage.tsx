@@ -168,7 +168,10 @@ export default function SettingsPage() {
                     </div>
                     <Checkbox
                       checked={isDeviceLockEnabled}
-                      onChange={() => handleUpdateDeviceLock()}
+                      onCheckedChange={(checked) => {
+                        setIsDeviceLockEnabled(checked as boolean);
+                        handleUpdateDeviceLock();
+                      }}
                     />
                   </div>
 

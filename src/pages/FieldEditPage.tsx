@@ -197,7 +197,7 @@ export default function FieldEditPage() {
                 <div className="flex items-center gap-3">
                   <Checkbox
                     checked={newFieldProtected}
-                    onChange={() => setNewFieldProtected(!newFieldProtected)}
+                    onCheckedChange={(checked) => setNewFieldProtected(checked as boolean)}
                   />
                   <Label>{t('common.protected')}</Label>
                 </div>
