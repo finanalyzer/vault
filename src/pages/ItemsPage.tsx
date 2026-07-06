@@ -72,6 +72,27 @@ export default function ItemsPage() {
   };
 
   const getIconForItem = (item: ItemDto) => {
+    if (item.icon) {
+      if (item.iconContentType === 'image/svg+xml') {
+        const svgContent = atob(item.icon);
+        return (
+          <div
+            dangerouslySetInnerHTML={{ __html: svgContent }}
+            className={`w-6 h-6 ${item.isGroup ? 'text-brand-main' : 'text-light-500 dark:text-dark-300'}`}
+          />
+        );
+      } else {
+        const src = `data:image/png;base64,${item.icon}`;
+        return (
+          <img
+            src={src}
+            alt={item.name}
+            className={`w-6 h-6 object-contain ${item.isGroup ? 'text-brand-main' : 'text-light-500'}`}
+          />
+        );
+      }
+    }
+
     if (item.isGroup) {
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-main">

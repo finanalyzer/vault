@@ -15,6 +15,7 @@ export interface ItemDto {
   isGroup: boolean;
   lastModified: string;
   icon?: string;
+  iconContentType?: string;
   description?: string;
 }
 
@@ -65,4 +66,5 @@ export interface IconDto {
   id: string;
   name: string;
   data: string;
+  contentType: string;
 }
