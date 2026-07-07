@@ -79,3 +79,7 @@ export interface IconDto {
   data: string;
   contentType: string;
 }
+
+export interface VaultInfoDto {
+  dataFilePath: string;
+}

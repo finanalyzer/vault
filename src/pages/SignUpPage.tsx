@@ -88,10 +88,7 @@ export default function SignUpPage() {
           <div className="p-8 sm:p-10">
             <div className="flex flex-col items-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-brand-main to-brand-darker rounded-xl flex items-center justify-center mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                  <path d="M50 25 L35 40 L35 60 L50 75 L65 60 L65 40 Z" transform="scale(0.15)"/>
-                  <circle cx="50" cy="50" r="10" fill="white" opacity="0.9" transform="scale(0.15)"/>
-                </svg>
+                <img src={`${import.meta.env.BASE_URL}passxyz.svg`} alt="PassXYZ" className="w-10 h-10 object-contain" />
               </div>
               <h1 className="text-2xl font-bold text-light-900 dark:text-light-100">
                 {t('signup.title')}

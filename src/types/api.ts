@@ -17,6 +17,7 @@ export interface UserProfileDto {
   createdAt: string;
   lastLogin: string;
   isDeviceLockEnabled: boolean;
+  vaultFilePath: string;
 }
 
 export interface SignUpRequest {

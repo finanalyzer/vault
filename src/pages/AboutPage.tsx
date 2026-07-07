@@ -1,11 +1,19 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@openbb/ui';
 import Sidebar from '../components/layout/Sidebar';
+import { useAuth } from '../hooks/useAuth';
+import { getUserProfile } from '../services/authService';
+import type { UserProfileDto } from '../types/api';
+import { version } from '../../package.json';
 
 export default function AboutPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user: authUser } = useAuth();
+  const [profile, setProfile] = useState<UserProfileDto | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const features = [
     {
@@ -51,6 +59,17 @@ export default function AboutPage() {
     },
   ];
 
+  useEffect(() => {
+    getUserProfile()
+      .then(setProfile)
+      .catch((err) => console.error('Failed to fetch user profile:', err))
+      .finally(() => setIsLoadingProfile(false));
+  }, []);
+
+  const username = profile?.username || authUser?.username || '—';
+  const email = profile?.email || authUser?.email || '—';
+  const vaultFilePath = profile?.vaultFilePath || '—';
+
   return (
     <div className="min-h-screen bg-light-100 dark:bg-dark-900 flex">
       <Sidebar />
@@ -76,10 +95,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <div className="w-24 h-24 bg-gradient-to-br from-brand-main to-brand-darker rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
-                  <path d="M50 25 L35 40 L35 60 L50 75 L65 60 L65 40 Z" transform="scale(0.15)"/>
-                  <circle cx="50" cy="50" r="10" fill="white" opacity="0.9" transform="scale(0.15)"/>
-                </svg>
+                <img src={`${import.meta.env.BASE_URL}passxyz.svg`} alt="PassXYZ" className="w-14 h-14 object-contain" />
               </div>
               <h2 className="text-3xl font-bold text-light-900 dark:text-light-100">
                 PassXYZ Vault
@@ -89,7 +105,7 @@ export default function AboutPage() {
               </p>
               <div className="mt-6 flex items-center justify-center gap-2">
                 <span className="px-3 py-1 bg-brand-main/10 text-brand-main rounded-full text-sm font-medium">
-                  v1.0.0
+                  v{version}
                 </span>
               </div>
             </div>
@@ -126,6 +142,34 @@ export default function AboutPage() {
                       {tech}
                     </span>
                   ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-white dark:bg-dark-800 rounded-xl shadow-light-5 dark:shadow-dark-5 overflow-hidden">
+              <div className="p-6 border-b border-light-200 dark:border-dark-600">
+                <h3 className="text-lg font-semibold text-light-900 dark:text-light-100">
+                  {t('common.systemInfo')}
+                </h3>
+              </div>
+              <div className="divide-y divide-light-100 dark:divide-dark-700">
+                <div className="flex items-center justify-between px-6 py-4">
+                  <span className="text-sm text-light-500 dark:text-dark-400">{t('common.username')}</span>
+                  <span className="text-sm font-medium text-light-900 dark:text-light-100">
+                    {isLoadingProfile ? '...' : username}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-6 py-4">
+                  <span className="text-sm text-light-500 dark:text-dark-400">{t('common.email')}</span>
+                  <span className="text-sm font-medium text-light-900 dark:text-light-100">
+                    {isLoadingProfile ? '...' : email}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-6 py-4">
+                  <span className="text-sm text-light-500 dark:text-dark-400">{t('common.dataFilePath')}</span>
+                  <span className="text-sm font-mono font-medium text-light-900 dark:text-light-100 max-w-xs truncate" title={vaultFilePath !== '—' ? vaultFilePath : undefined}>
+                    {isLoadingProfile ? '...' : vaultFilePath}
+                  </span>
                 </div>
               </div>
             </div>
