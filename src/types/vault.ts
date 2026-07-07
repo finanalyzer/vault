@@ -80,6 +80,3 @@ export interface IconDto {
   contentType: string;
 }
 
-export interface VaultInfoDto {
-  dataFilePath: string;
-}

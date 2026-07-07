@@ -6,7 +6,7 @@ import type { NewEntryRequest } from '../types/vault';
 import type { NewGroupRequest } from '../types/vault';
 import type { AttachmentDto } from '../types/vault';
 import type { IconDto } from '../types/vault';
-import type { VaultInfoDto } from '../types/vault';
+
 
 export async function getItemsByGroup(groupId: string): Promise<ItemDto[]> {
   const response = await apiClient.get<ItemDto[]>(`/vault/groups/${groupId}/items`);
@@ -103,9 +103,4 @@ export async function uploadAttachment(entryId: string, file: File): Promise<Att
 
 export async function deleteAttachment(entryId: string, attachmentId: string): Promise<void> {
   await apiClient.delete(`/vault/entries/${entryId}/attachments/${attachmentId}`);
-}
-
-export async function getVaultInfo(): Promise<VaultInfoDto> {
-  const response = await apiClient.get<VaultInfoDto>('/vault/info');
-  return response.data;
 }
