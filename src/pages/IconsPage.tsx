@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@openbb/ui';
-import { getIcons } from '../services/vaultService';
+import { getIcons, updateEntry, updateGroup } from '../services/vaultService';
 import type { IconDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
 
 export default function IconsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { itemId, isGroup } = useSearch({ from: '/vault/icons' });
   const [icons, setIcons] = useState<IconDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [selectedIcon, setSelectedIcon] = useState<IconDto | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     loadIcons();
@@ -27,6 +30,38 @@ export default function IconsPage() {
       setIcons([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedIcon || !itemId) return;
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      // Server IconDto.Id is int, but ItemDto.Icon expects string
+      const iconData = { icon: String(selectedIcon.id) };
+      if (isGroup) {
+        await updateGroup(itemId, iconData);
+      } else {
+        await updateEntry(itemId, iconData);
+      }
+      navigate({ to: '/vault' });
+    } catch (err: unknown) {
+      setIsSaving(false);
+      const axiosErr = err as { response?: { data?: { title?: string; errors?: Record<string, string[]> } | string }; message?: string };
+      let message = '';
+      if (typeof axiosErr?.response?.data === 'object' && axiosErr.response.data !== null) {
+        const data = axiosErr.response.data;
+        if (data.title) {
+          message = data.title;
+        } else if (data.errors) {
+          message = Object.values(data.errors).flat().join('; ');
+        }
+      }
+      if (!message && typeof axiosErr?.response?.data === 'string') {
+        message = axiosErr.response.data;
+      }
+      setSaveError(message || (axiosErr?.message || t('common.error')));
     }
   };
 
@@ -49,10 +84,24 @@ export default function IconsPage() {
                 {t('common.selectIcon')}
               </p>
             </div>
-            <Button variant="secondary" onClick={() => navigate({ to: '/vault' })}>
-              {t('common.close')}
-            </Button>
+            <div className="flex items-center gap-3">
+              {selectedIcon && (
+                <Button
+                  variant="primary"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? t('common.loading') : t('common.save')}
+                </Button>
+              )}
+              <Button variant="secondary" onClick={() => navigate({ to: '/vault' })}>
+                {t('common.close')}
+              </Button>
+            </div>
           </div>
+          {saveError && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{saveError}</p>
+          )}
         </header>
 
         <main className="flex-1 p-6">
@@ -86,9 +135,9 @@ export default function IconsPage() {
                 {filteredIcons.map((icon) => (
                   <button
                     key={icon.id}
-                    onClick={() => setSelectedIcon(icon.id)}
+                    onClick={() => setSelectedIcon(icon)}
                     className={`aspect-square flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-colors ${
-                      selectedIcon === icon.id
+                      selectedIcon?.id === icon.id
                         ? 'border-brand-main bg-brand-main/10'
                         : 'border-light-200 dark:border-dark-600 hover:border-brand-main'
                     }`}
