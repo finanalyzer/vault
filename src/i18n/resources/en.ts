@@ -133,5 +133,9 @@ export const en = {
     deviceLockDisabled: "Device Lock is not enabled. Please enable it in Settings.",
     copyright: "Copyright",
     techStack: "Technology Stack",
+    basicInfo: "Basic Information",
+    changeIcon: "Change Icon",
+    confirmDelete: "Are you sure you want to delete '{{name}}'?",
+    more: "More",
   },
 };

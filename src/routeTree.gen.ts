@@ -24,7 +24,10 @@ import { Route as VaultNotesEntryIdRouteImport } from './routes/vault/notes/$ent
 import { Route as VaultNewGroupIdRouteImport } from './routes/vault/new/$groupId'
 import { Route as VaultGroupsGroupIdRouteImport } from './routes/vault/groups/$groupId'
 import { Route as VaultEntriesEntryIdRouteImport } from './routes/vault/entries/$entryId'
+import { Route as VaultGroupsGroupIdIndexRouteImport } from './routes/vault/groups/$groupId/index'
+import { Route as VaultEntriesEntryIdIndexRouteImport } from './routes/vault/entries/$entryId/index'
 import { Route as VaultPreviewEntryIdAttachmentIdRouteImport } from './routes/vault/preview/$entryId/$attachmentId'
+import { Route as VaultGroupsGroupIdFieldsRouteImport } from './routes/vault/groups/$groupId/fields'
 import { Route as VaultEntriesEntryIdFieldsRouteImport } from './routes/vault/entries/$entryId/fields'
 
 const UsersRoute = UsersRouteImport.update({
@@ -102,11 +105,28 @@ const VaultEntriesEntryIdRoute = VaultEntriesEntryIdRouteImport.update({
   path: '/vault/entries/$entryId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VaultGroupsGroupIdIndexRoute = VaultGroupsGroupIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VaultGroupsGroupIdRoute,
+} as any)
+const VaultEntriesEntryIdIndexRoute =
+  VaultEntriesEntryIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => VaultEntriesEntryIdRoute,
+  } as any)
 const VaultPreviewEntryIdAttachmentIdRoute =
   VaultPreviewEntryIdAttachmentIdRouteImport.update({
     id: '/vault/preview/$entryId/$attachmentId',
     path: '/vault/preview/$entryId/$attachmentId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const VaultGroupsGroupIdFieldsRoute =
+  VaultGroupsGroupIdFieldsRouteImport.update({
+    id: '/fields',
+    path: '/fields',
+    getParentRoute: () => VaultGroupsGroupIdRoute,
   } as any)
 const VaultEntriesEntryIdFieldsRoute =
   VaultEntriesEntryIdFieldsRouteImport.update({
@@ -128,11 +148,14 @@ export interface FileRoutesByFullPath {
   '/vault/settings': typeof VaultSettingsRoute
   '/vault/': typeof VaultIndexRoute
   '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
-  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRouteWithChildren
   '/vault/new/$groupId': typeof VaultNewGroupIdRoute
   '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
   '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/groups/$groupId/fields': typeof VaultGroupsGroupIdFieldsRoute
   '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
+  '/vault/entries/$entryId/': typeof VaultEntriesEntryIdIndexRoute
+  '/vault/groups/$groupId/': typeof VaultGroupsGroupIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -146,12 +169,13 @@ export interface FileRoutesByTo {
   '/vault/search': typeof VaultSearchRoute
   '/vault/settings': typeof VaultSettingsRoute
   '/vault': typeof VaultIndexRoute
-  '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
-  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
   '/vault/new/$groupId': typeof VaultNewGroupIdRoute
   '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
   '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/groups/$groupId/fields': typeof VaultGroupsGroupIdFieldsRoute
   '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
+  '/vault/entries/$entryId': typeof VaultEntriesEntryIdIndexRoute
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,11 +191,14 @@ export interface FileRoutesById {
   '/vault/settings': typeof VaultSettingsRoute
   '/vault/': typeof VaultIndexRoute
   '/vault/entries/$entryId': typeof VaultEntriesEntryIdRouteWithChildren
-  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRoute
+  '/vault/groups/$groupId': typeof VaultGroupsGroupIdRouteWithChildren
   '/vault/new/$groupId': typeof VaultNewGroupIdRoute
   '/vault/notes/$entryId': typeof VaultNotesEntryIdRoute
   '/vault/entries/$entryId/fields': typeof VaultEntriesEntryIdFieldsRoute
+  '/vault/groups/$groupId/fields': typeof VaultGroupsGroupIdFieldsRoute
   '/vault/preview/$entryId/$attachmentId': typeof VaultPreviewEntryIdAttachmentIdRoute
+  '/vault/entries/$entryId/': typeof VaultEntriesEntryIdIndexRoute
+  '/vault/groups/$groupId/': typeof VaultGroupsGroupIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,7 +219,10 @@ export interface FileRouteTypes {
     | '/vault/new/$groupId'
     | '/vault/notes/$entryId'
     | '/vault/entries/$entryId/fields'
+    | '/vault/groups/$groupId/fields'
     | '/vault/preview/$entryId/$attachmentId'
+    | '/vault/entries/$entryId/'
+    | '/vault/groups/$groupId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,12 +236,13 @@ export interface FileRouteTypes {
     | '/vault/search'
     | '/vault/settings'
     | '/vault'
-    | '/vault/entries/$entryId'
-    | '/vault/groups/$groupId'
     | '/vault/new/$groupId'
     | '/vault/notes/$entryId'
     | '/vault/entries/$entryId/fields'
+    | '/vault/groups/$groupId/fields'
     | '/vault/preview/$entryId/$attachmentId'
+    | '/vault/entries/$entryId'
+    | '/vault/groups/$groupId'
   id:
     | '__root__'
     | '/'
@@ -230,7 +261,10 @@ export interface FileRouteTypes {
     | '/vault/new/$groupId'
     | '/vault/notes/$entryId'
     | '/vault/entries/$entryId/fields'
+    | '/vault/groups/$groupId/fields'
     | '/vault/preview/$entryId/$attachmentId'
+    | '/vault/entries/$entryId/'
+    | '/vault/groups/$groupId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -246,7 +280,7 @@ export interface RootRouteChildren {
   VaultSettingsRoute: typeof VaultSettingsRoute
   VaultIndexRoute: typeof VaultIndexRoute
   VaultEntriesEntryIdRoute: typeof VaultEntriesEntryIdRouteWithChildren
-  VaultGroupsGroupIdRoute: typeof VaultGroupsGroupIdRoute
+  VaultGroupsGroupIdRoute: typeof VaultGroupsGroupIdRouteWithChildren
   VaultNewGroupIdRoute: typeof VaultNewGroupIdRoute
   VaultNotesEntryIdRoute: typeof VaultNotesEntryIdRoute
   VaultPreviewEntryIdAttachmentIdRoute: typeof VaultPreviewEntryIdAttachmentIdRoute
@@ -359,12 +393,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VaultEntriesEntryIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vault/groups/$groupId/': {
+      id: '/vault/groups/$groupId/'
+      path: '/'
+      fullPath: '/vault/groups/$groupId/'
+      preLoaderRoute: typeof VaultGroupsGroupIdIndexRouteImport
+      parentRoute: typeof VaultGroupsGroupIdRoute
+    }
+    '/vault/entries/$entryId/': {
+      id: '/vault/entries/$entryId/'
+      path: '/'
+      fullPath: '/vault/entries/$entryId/'
+      preLoaderRoute: typeof VaultEntriesEntryIdIndexRouteImport
+      parentRoute: typeof VaultEntriesEntryIdRoute
+    }
     '/vault/preview/$entryId/$attachmentId': {
       id: '/vault/preview/$entryId/$attachmentId'
       path: '/vault/preview/$entryId/$attachmentId'
       fullPath: '/vault/preview/$entryId/$attachmentId'
       preLoaderRoute: typeof VaultPreviewEntryIdAttachmentIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/vault/groups/$groupId/fields': {
+      id: '/vault/groups/$groupId/fields'
+      path: '/fields'
+      fullPath: '/vault/groups/$groupId/fields'
+      preLoaderRoute: typeof VaultGroupsGroupIdFieldsRouteImport
+      parentRoute: typeof VaultGroupsGroupIdRoute
     }
     '/vault/entries/$entryId/fields': {
       id: '/vault/entries/$entryId/fields'
@@ -378,14 +433,29 @@ declare module '@tanstack/react-router' {
 
 interface VaultEntriesEntryIdRouteChildren {
   VaultEntriesEntryIdFieldsRoute: typeof VaultEntriesEntryIdFieldsRoute
+  VaultEntriesEntryIdIndexRoute: typeof VaultEntriesEntryIdIndexRoute
 }
 
 const VaultEntriesEntryIdRouteChildren: VaultEntriesEntryIdRouteChildren = {
   VaultEntriesEntryIdFieldsRoute: VaultEntriesEntryIdFieldsRoute,
+  VaultEntriesEntryIdIndexRoute: VaultEntriesEntryIdIndexRoute,
 }
 
 const VaultEntriesEntryIdRouteWithChildren =
   VaultEntriesEntryIdRoute._addFileChildren(VaultEntriesEntryIdRouteChildren)
+
+interface VaultGroupsGroupIdRouteChildren {
+  VaultGroupsGroupIdFieldsRoute: typeof VaultGroupsGroupIdFieldsRoute
+  VaultGroupsGroupIdIndexRoute: typeof VaultGroupsGroupIdIndexRoute
+}
+
+const VaultGroupsGroupIdRouteChildren: VaultGroupsGroupIdRouteChildren = {
+  VaultGroupsGroupIdFieldsRoute: VaultGroupsGroupIdFieldsRoute,
+  VaultGroupsGroupIdIndexRoute: VaultGroupsGroupIdIndexRoute,
+}
+
+const VaultGroupsGroupIdRouteWithChildren =
+  VaultGroupsGroupIdRoute._addFileChildren(VaultGroupsGroupIdRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -400,7 +470,7 @@ const rootRouteChildren: RootRouteChildren = {
   VaultSettingsRoute: VaultSettingsRoute,
   VaultIndexRoute: VaultIndexRoute,
   VaultEntriesEntryIdRoute: VaultEntriesEntryIdRouteWithChildren,
-  VaultGroupsGroupIdRoute: VaultGroupsGroupIdRoute,
+  VaultGroupsGroupIdRoute: VaultGroupsGroupIdRouteWithChildren,
   VaultNewGroupIdRoute: VaultNewGroupIdRoute,
   VaultNotesEntryIdRoute: VaultNotesEntryIdRoute,
   VaultPreviewEntryIdAttachmentIdRoute: VaultPreviewEntryIdAttachmentIdRoute,

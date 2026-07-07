@@ -17,6 +17,15 @@ export interface ItemDto {
   icon?: string;
   iconContentType?: string;
   description?: string;
+  notes?: string;
+}
+
+export interface FieldDto {
+  key: string;
+  value: string;
+  isProtected: boolean;
+  isBinary: boolean;
+  encodedKey?: string;
 }
 
 export interface EntryDto extends ItemDto {
@@ -25,9 +34,9 @@ export interface EntryDto extends ItemDto {
   url?: string;
   email?: string;
   mobile?: string;
-  notes?: string;
   otpUrl?: string;
   customFields?: Record<string, string>;
+  fields?: FieldDto[];
   attachments?: AttachmentDto[];
   groupId?: string;
 }
@@ -47,7 +56,9 @@ export interface NewEntryRequest {
   email?: string;
   mobile?: string;
   notes?: string;
+  otpUrl?: string;
   customFields?: Record<string, string>;
+  fields?: FieldDto[];
 }
 
 export interface NewGroupRequest {

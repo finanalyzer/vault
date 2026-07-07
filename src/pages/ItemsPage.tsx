@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@openbb/ui';
-import { getItemsByGroup, getGroup } from '../services/vaultService';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
+import { getItemsByGroup, getGroup, deleteEntry, deleteGroup } from '../services/vaultService';
 import type { ItemDto } from '../types/vault';
 import { ItemSubType } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -19,10 +19,23 @@ export default function ItemsPage() {
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
   const [rootGroupId, setRootGroupId] = useState<string>('root');
   const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
+  
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; item: ItemDto } | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<ItemDto | null>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     loadData();
   }, [groupId]);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setContextMenu(null);
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -57,14 +70,64 @@ export default function ItemsPage() {
 
   const handleItemClick = (item: ItemDto) => {
     if (item.isGroup) {
-      navigate({ to: `/vault/groups/${item.id}` });
+      navigate({ to: '/vault/groups/$groupId', params: { groupId: item.id } });
     } else {
       if (item.type === ItemSubType.Notes) {
-        navigate({ to: `/vault/notes/${item.id}` });
+        navigate({ to: '/vault/notes/$entryId', params: { entryId: item.id } });
       } else {
-        navigate({ to: `/vault/entries/${item.id}` });
+        navigate({ to: '/vault/entries/$entryId', params: { entryId: item.id } });
       }
     }
+  };
+
+  const handleContextMenu = useCallback((e: React.MouseEvent, item: ItemDto) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setContextMenu({ x: rect.right - 160, y: rect.bottom + 4, item });
+  }, []);
+
+  const handleEdit = () => {
+    if (!contextMenu) return;
+    const { item } = contextMenu;
+    if (item.isGroup) {
+      navigate({ to: '/vault/groups/$groupId/fields', params: { groupId: item.id } });
+    } else {
+      navigate({ to: '/vault/entries/$entryId/fields', params: { entryId: item.id } });
+    }
+    setContextMenu(null);
+  };
+
+  const handleDelete = () => {
+    if (!contextMenu) return;
+    setItemToDelete(contextMenu.item);
+    setShowDeleteConfirm(true);
+    setContextMenu(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      if (itemToDelete.isGroup) {
+        await deleteGroup(itemToDelete.id);
+      } else {
+        await deleteEntry(itemToDelete.id);
+      }
+      setNotification({ type: 'success', message: t('common.delete') + ' ' + t('common.success') });
+      setItems(items.filter(i => i.id !== itemToDelete.id));
+      setTimeout(() => setNotification(null), 3000);
+    } catch {
+      setNotification({ type: 'error', message: t('common.error') });
+      setTimeout(() => setNotification(null), 3000);
+    } finally {
+      setShowDeleteConfirm(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleChangeIcon = () => {
+    if (!contextMenu) return;
+    navigate({ to: `/vault/icons?itemId=${contextMenu.item.id}&isGroup=${contextMenu.item.isGroup}` });
+    setContextMenu(null);
   };
 
   const handleNewItem = () => {
@@ -152,6 +215,14 @@ export default function ItemsPage() {
         </header>
 
         <main className="flex-1 p-6">
+          {notification && (
+            <div className={`p-4 mb-4 ${notification.type === 'success' ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800' : 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800'} border rounded-lg`}>
+              <p className={`text-sm ${notification.type === 'success' ? 'text-success-600 dark:text-success-400' : 'text-danger-600 dark:text-danger-400'}`}>
+                {notification.message}
+              </p>
+            </div>
+          )}
+
           <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden">
             {isLoading ? (
               <div className="p-8 text-center">
@@ -198,6 +269,17 @@ export default function ItemsPage() {
                         Group
                       </span>
                     )}
+                    <button
+                      onClick={(e) => handleContextMenu(e, item)}
+                      className="flex-shrink-0 p-2 text-light-400 dark:text-dark-500 hover:text-brand-main hover:bg-light-100 dark:hover:bg-dark-700 rounded-lg transition-colors"
+                      title={t('common.more')}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="19" cy="12" r="1" />
+                        <circle cx="5" cy="12" r="1" />
+                      </svg>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -205,6 +287,69 @@ export default function ItemsPage() {
           </div>
         </main>
       </div>
+
+      {contextMenu && (
+        <div
+          className="fixed z-50 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-light-200 dark:border-dark-600 py-1 min-w-[160px]"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={handleEdit}
+            className="w-full text-left px-4 py-2 text-sm text-light-900 dark:text-light-100 hover:bg-light-100 dark:hover:bg-dark-700 flex items-center gap-2"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+            </svg>
+            {t('common.edit')}
+          </button>
+          <button
+            onClick={handleChangeIcon}
+            className="w-full text-left px-4 py-2 text-sm text-light-900 dark:text-light-100 hover:bg-light-100 dark:hover:bg-dark-700 flex items-center gap-2"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            {t('common.changeIcon')}
+          </button>
+          <div className="border-t border-light-200 dark:border-dark-600 my-1" />
+          <button
+            onClick={handleDelete}
+            className="w-full text-left px-4 py-2 text-sm text-danger-600 dark:text-danger-400 hover:bg-light-100 dark:hover:bg-dark-700 flex items-center gap-2"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 6h18" />
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            </svg>
+            {t('common.delete')}
+          </button>
+        </div>
+      )}
+
+      <Dialog open={showDeleteConfirm} onOpenChange={() => setShowDeleteConfirm(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('common.delete')}</DialogTitle>
+            <p className="text-light-600 dark:text-light-300">
+              {t('common.confirmDelete', { name: itemToDelete?.name })}
+            </p>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              {t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

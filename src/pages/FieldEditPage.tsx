@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Label, Checkbox } from '@openbb/ui';
+import { Button, Input, Label, Checkbox, Textarea } from '@openbb/ui';
 import { getEntry, updateEntry } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
+import type { FieldDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
-
-interface CustomField {
-  key: string;
-  value: string;
-  isProtected: boolean;
-}
 
 export default function FieldEditPage() {
   const params = useParams({ from: '/vault/entries/$entryId/fields' });
@@ -19,13 +14,22 @@ export default function FieldEditPage() {
   const { t } = useTranslation();
   const [entry, setEntry] = useState<EntryDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [fields, setFields] = useState<FieldDto[]>([]);
   const [newFieldKey, setNewFieldKey] = useState('');
   const [newFieldValue, setNewFieldValue] = useState('');
   const [newFieldProtected, setNewFieldProtected] = useState(false);
   const [error, setError] = useState<string>('');
   const [notification, setNotification] = useState<string | null>(null);
   const [showProtectedValues, setShowProtectedValues] = useState(false);
+
+  const [editName, setEditName] = useState('');
+  const [editUsername, setEditUsername] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editUrl, setEditUrl] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editMobile, setEditMobile] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     loadEntry();
@@ -36,12 +40,23 @@ export default function FieldEditPage() {
     try {
       const data = await getEntry(entryId!);
       setEntry(data);
-      if (data.customFields) {
-        setCustomFields(
+      setEditName(data.name || '');
+      setEditUsername(data.username || '');
+      setEditPassword(data.password || '');
+      setEditUrl(data.url || '');
+      setEditEmail(data.email || '');
+      setEditMobile(data.mobile || '');
+      setEditNotes(data.notes || '');
+
+      if (data.fields) {
+        setFields(data.fields.filter(f => !f.isBinary));
+      } else if (data.customFields) {
+        setFields(
           Object.entries(data.customFields).map(([key, value]) => ({
             key,
             value,
             isProtected: false,
+            isBinary: false,
           }))
         );
       }
@@ -54,14 +69,14 @@ export default function FieldEditPage() {
 
   const handleAddField = () => {
     if (!newFieldKey.trim()) return;
-    const exists = customFields.some(f => f.key === newFieldKey.trim());
+    const exists = fields.some(f => f.key === newFieldKey.trim());
     if (exists) {
       setError(t('common.error') + ': ' + t('common.duplicate'));
       return;
     }
-    setCustomFields([
-      ...customFields,
-      { key: newFieldKey.trim(), value: newFieldValue.trim(), isProtected: newFieldProtected },
+    setFields([
+      ...fields,
+      { key: newFieldKey.trim(), value: newFieldValue.trim(), isProtected: newFieldProtected, isBinary: false },
     ]);
     setNewFieldKey('');
     setNewFieldValue('');
@@ -70,15 +85,15 @@ export default function FieldEditPage() {
   };
 
   const handleRemoveField = (key: string) => {
-    setCustomFields(customFields.filter(f => f.key !== key));
+    setFields(fields.filter(f => f.key !== key));
   };
 
   const handleUpdateField = (key: string, newValue: string) => {
-    setCustomFields(customFields.map(f => (f.key === key ? { ...f, value: newValue } : f)));
+    setFields(fields.map(f => (f.key === key ? { ...f, value: newValue } : f)));
   };
 
   const handleToggleProtected = (key: string) => {
-    setCustomFields(customFields.map(f => (f.key === key ? { ...f, isProtected: !f.isProtected } : f)));
+    setFields(fields.map(f => (f.key === key ? { ...f, isProtected: !f.isProtected } : f)));
   };
 
   const handleSave = async () => {
@@ -86,19 +101,21 @@ export default function FieldEditPage() {
     setError('');
 
     try {
-      const updatedCustomFields: Record<string, string> = {};
-      customFields.forEach(f => {
-        updatedCustomFields[f.key] = f.value;
-      });
-
       await updateEntry(entryId!, {
         ...entry,
-        customFields: Object.keys(updatedCustomFields).length > 0 ? updatedCustomFields : undefined,
+        name: editName,
+        username: editUsername || undefined,
+        password: editPassword || undefined,
+        url: editUrl || undefined,
+        email: editEmail || undefined,
+        mobile: editMobile || undefined,
+        notes: editNotes || undefined,
+        fields: fields.length > 0 ? fields : undefined,
       });
 
       setNotification(t('common.save') + ' ' + t('common.success'));
       setTimeout(() => {
-        navigate({ to: `/vault/entries/${entryId}` });
+        navigate({ to: '/vault/entries/$entryId', params: { entryId } });
       }, 1500);
     } catch {
       setError(t('common.error'));
@@ -142,14 +159,11 @@ export default function FieldEditPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
-                {t('common.edit')} {t('common.fields')}
+                {t('common.edit')} {entry.name}
               </h1>
-              <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
-                {entry.name}
-              </p>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}` })}>
+              <Button variant="secondary" onClick={() => navigate({ to: '/vault/entries/$entryId', params: { entryId } })}>
                 {t('common.cancel')}
               </Button>
               <Button variant="primary" onClick={handleSave}>
@@ -166,6 +180,107 @@ export default function FieldEditPage() {
                 <p className="text-sm text-success-600 dark:text-success-400">{notification}</p>
               </div>
             )}
+
+            <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden mb-6">
+              <div className="p-6 border-b border-light-200 dark:border-dark-600">
+                <h2 className="text-lg font-semibold text-light-900 dark:text-light-100">
+                  {t('common.basicInfo')}
+                </h2>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <Label>{t('common.name')}</Label>
+                  <Input
+                    type="text"
+                    value={editName}
+                    onChange={(value) => setEditName(String(value))}
+                    placeholder={t('common.name')}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('login.username')}</Label>
+                    <Input
+                      type="text"
+                      value={editUsername}
+                      onChange={(value) => setEditUsername(String(value))}
+                      placeholder="username"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('login.masterPassword')}</Label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        value={editPassword}
+                        onChange={(value) => setEditPassword(String(value))}
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-light-500 dark:text-dark-300 hover:text-light-700 dark:hover:text-light-200 transition-colors"
+                      >
+                        {showPassword ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9.87 9.87a3 3 0 1 0 4.26 4.26" />
+                            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c1.09 0 2.16-.16 3.16-.46" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('login.email')}</Label>
+                    <Input
+                      type="email"
+                      value={editEmail}
+                      onChange={(value) => setEditEmail(String(value))}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('login.mobile')}</Label>
+                    <Input
+                      type="tel"
+                      value={editMobile}
+                      onChange={(value) => setEditMobile(String(value))}
+                      placeholder="+1 234 567 8900"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('login.url')}</Label>
+                  <Input
+                    type="url"
+                    value={editUrl}
+                    onChange={(value) => setEditUrl(String(value))}
+                    placeholder="https://example.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('common.notes')}</Label>
+                  <Textarea
+                    rows={4}
+                    value={editNotes}
+                    onChange={(value) => setEditNotes(String(value))}
+                    placeholder="Add notes..."
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden mb-6">
               <div className="p-6 border-b border-light-200 dark:border-dark-600">
@@ -213,9 +328,9 @@ export default function FieldEditPage() {
             <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden">
               <div className="p-6 border-b border-light-200 dark:border-dark-600 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-light-900 dark:text-light-100">
-                  {t('common.fields')} ({customFields.length})
+                  {t('common.fields')} ({fields.length})
                 </h2>
-                {customFields.some(f => f.isProtected) && (
+                {fields.some(f => f.isProtected) && (
                   <button
                     onClick={() => setShowProtectedValues(!showProtectedValues)}
                     className="text-sm text-brand-main hover:text-brand-darker transition-colors"
@@ -224,7 +339,7 @@ export default function FieldEditPage() {
                   </button>
                 )}
               </div>
-              {customFields.length === 0 ? (
+              {fields.length === 0 ? (
                 <div className="p-8 text-center">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-light-300 dark:text-dark-500">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -234,7 +349,7 @@ export default function FieldEditPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-light-100 dark:divide-dark-700">
-                  {customFields.map((field) => (
+                  {fields.map((field) => (
                     <div key={field.key} className="flex items-center gap-4 px-6 py-4 hover:bg-light-50 dark:hover:bg-dark-700">
                       <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-light-100 dark:bg-dark-700 rounded-lg">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-light-500">
@@ -254,17 +369,15 @@ export default function FieldEditPage() {
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        {field.isProtected && (
-                          <button
-                            onClick={() => handleToggleProtected(field.key)}
-                            className="p-2 text-warning-500 hover:text-warning-600 transition-colors"
-                            title={t('common.protected')}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                            </svg>
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleToggleProtected(field.key)}
+                          className={`p-2 transition-colors ${field.isProtected ? 'text-warning-500 hover:text-warning-600' : 'text-light-400 hover:text-warning-500'}`}
+                          title={t('common.protected')}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          </svg>
+                        </button>
                         <button
                           onClick={() => handleRemoveField(field.key)}
                           className="p-2 text-light-400 hover:text-danger-500 transition-colors"

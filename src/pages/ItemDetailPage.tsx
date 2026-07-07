@@ -22,6 +22,7 @@ export default function ItemDetailPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [fieldContextMenu, setFieldContextMenu] = useState<{ x: number; y: number; field: string; value: string } | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [rootGroupName, setRootGroupName] = useState<string>('Root');
   const [rootGroupId, setRootGroupId] = useState<string>('root');
@@ -34,6 +35,14 @@ export default function ItemDetailPage() {
     loadAttachments();
     loadRootGroupName();
   }, [entryId]);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setFieldContextMenu(null);
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const loadEntry = async () => {
     setIsLoading(true);
@@ -89,6 +98,13 @@ export default function ItemDetailPage() {
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
     }
+    setFieldContextMenu(null);
+  };
+
+  const handleFieldMenuButtonClick = (e: React.MouseEvent, field: string, value: string) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setFieldContextMenu({ x: rect.right - 120, y: rect.bottom + 4, field, value });
   };
 
   const handleDelete = async () => {
@@ -205,7 +221,7 @@ export default function ItemDetailPage() {
               <Breadcrumbs groupId={groupId} groupName={groupName} rootGroupName={rootGroupName} rootGroupId={rootGroupId} parentGroup={parentGroup} />
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="secondary" onClick={() => navigate({ to: `/vault/entries/${entryId}/fields` })}>
+              <Button variant="secondary" onClick={() => navigate({ to: '/vault/entries/$entryId/fields', params: { entryId } })}>
                 {t('common.edit')}
               </Button>
               <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
@@ -272,9 +288,9 @@ export default function ItemDetailPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleCopy(item.label, item.value!)}
-                      className="flex-shrink-0 p-2 text-light-400 dark:text-dark-500 hover:text-brand-main transition-colors"
-                      title={t('common.copy')}
+                      onClick={(e) => handleFieldMenuButtonClick(e, item.label, item.value!)}
+                      className="flex-shrink-0 p-2 text-light-400 dark:text-dark-500 hover:text-brand-main hover:bg-light-100 dark:hover:bg-dark-700 rounded-lg transition-colors"
+                      title={t('common.more')}
                     >
                       {copiedField === item.label ? (
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-success-500">
@@ -282,8 +298,9 @@ export default function ItemDetailPage() {
                         </svg>
                       ) : (
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="19" cy="12" r="1" />
+                          <circle cx="5" cy="12" r="1" />
                         </svg>
                       )}
                     </button>
@@ -307,13 +324,21 @@ export default function ItemDetailPage() {
                           <span className="text-sm text-light-900 dark:text-light-100">{value}</span>
                         </div>
                         <button
-                          onClick={() => handleCopy(key, value)}
-                          className="flex-shrink-0 p-2 text-light-400 dark:text-dark-500 hover:text-brand-main transition-colors"
+                          onClick={(e) => handleFieldMenuButtonClick(e, key, value)}
+                          className="flex-shrink-0 p-2 text-light-400 dark:text-dark-500 hover:text-brand-main hover:bg-light-100 dark:hover:bg-dark-700 rounded-lg transition-colors"
+                          title={t('common.more')}
                         >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                          </svg>
+                          {copiedField === key ? (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-success-500">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="1" />
+                              <circle cx="19" cy="12" r="1" />
+                              <circle cx="5" cy="12" r="1" />
+                            </svg>
+                          )}
                         </button>
                       </div>
                     ))}
@@ -431,6 +456,28 @@ export default function ItemDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {fieldContextMenu && (
+        <div
+          className="fixed z-50 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-light-200 dark:border-dark-600 py-1 min-w-[120px]"
+          style={{
+            left: fieldContextMenu.x,
+            top: fieldContextMenu.y,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handleCopy(fieldContextMenu.field, fieldContextMenu.value)}
+            className="w-full text-left px-4 py-2 text-sm text-light-900 dark:text-light-100 hover:bg-light-100 dark:hover:bg-dark-700 flex items-center gap-2"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            {t('common.copy')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

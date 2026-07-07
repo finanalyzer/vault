@@ -133,5 +133,9 @@ export const zh = {
     deviceLockDisabled: "设备锁未启用。请在设置中启用。",
     copyright: "版权",
     techStack: "技术栈",
+    basicInfo: "基本信息",
+    changeIcon: "更换图标",
+    confirmDelete: "确定要删除 '{{name}}' 吗？",
+    more: "更多",
   },
 };
