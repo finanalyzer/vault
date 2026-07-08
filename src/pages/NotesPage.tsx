@@ -5,9 +5,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import { Button } from '@openbb/ui';
-import { getEntry, updateEntry } from '../services/vaultService';
+import { getEntry, updateEntry, getGroup } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
+import type { GroupDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
+import Breadcrumbs from '../components/layout/Breadcrumbs';
 
 export default function NotesPage() {
   const params = useParams({ from: '/vault/notes/$entryId' });
@@ -20,9 +22,15 @@ export default function NotesPage() {
   const [editedNotes, setEditedNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [rootGroupName, setRootGroupName] = useState<string>('Root');
+  const [rootGroupId, setRootGroupId] = useState<string>('root');
+  const [groupName, setGroupName] = useState<string>('');
+  const [groupId, setGroupId] = useState<string>('root');
+  const [parentGroup, setParentGroup] = useState<{ id: string; name: string } | undefined>();
 
   useEffect(() => {
     loadEntry();
+    loadRootGroupName();
   }, [entryId]);
 
   useEffect(() => {
@@ -33,9 +41,26 @@ export default function NotesPage() {
 
   const loadEntry = async () => {
     setIsLoading(true);
+    setParentGroup(undefined);
     try {
       const data = await getEntry(entryId!);
       setEntry(data);
+      
+      if (data.groupId) {
+        setGroupId(data.groupId);
+        const group = await getGroup(data.groupId);
+        setGroupName(group.name);
+        
+        const rootGroup = await getGroup('root');
+        setRootGroupId(rootGroup.id);
+        
+        if (group.parentId && group.parentId !== rootGroup.id) {
+          const parent = await getGroup(group.parentId);
+          setParentGroup({ id: parent.id, name: parent.name });
+        } else {
+          setParentGroup(undefined);
+        }
+      }
     } catch {
       setEntry(null);
     } finally {
@@ -66,6 +91,15 @@ export default function NotesPage() {
       setTimeout(() => setNotification(null), 3000);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const loadRootGroupName = async () => {
+    try {
+      const rootGroup: GroupDto = await getGroup('root');
+      setRootGroupName(rootGroup.name);
+    } catch {
+      setRootGroupName('Root');
     }
   };
 
@@ -108,9 +142,13 @@ export default function NotesPage() {
               <h1 className="text-xl font-bold text-light-900 dark:text-light-100">
                 {entry.name}
               </h1>
-              <p className="text-sm text-light-500 dark:text-dark-400 mt-1">
-                {t('common.notes')}
-              </p>
+              <Breadcrumbs 
+                groupId={groupId} 
+                groupName={groupName} 
+                rootGroupName={rootGroupName} 
+                rootGroupId={rootGroupId} 
+                parentGroup={parentGroup} 
+              />
             </div>
             <div className="flex items-center gap-4">
               {isEditing ? (
