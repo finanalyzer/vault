@@ -42,7 +42,7 @@ export default function Sidebar() {
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
         </svg>
       ),
-      label: 'Home',
+      label: t('common.home'),
       path: '/vault',
     },
     {
@@ -52,7 +52,7 @@ export default function Sidebar() {
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       ),
-      label: 'Search',
+      label: t('common.search'),
       path: '/vault/search',
     },
     {
@@ -63,7 +63,7 @@ export default function Sidebar() {
           <line x1="8" y1="5" x2="8" y2="19" />
         </svg>
       ),
-      label: 'OTP',
+      label: t('common.otp'),
       path: '/vault/otp',
     },
     {
@@ -72,7 +72,7 @@ export default function Sidebar() {
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
       ),
-      label: 'Settings',
+      label: t('common.settings'),
       path: '/vault/settings',
     },
     {
@@ -83,7 +83,7 @@ export default function Sidebar() {
           <line x1="12" y1="16" x2="12" y2="16.01" />
         </svg>
       ),
-      label: 'About',
+      label: t('common.about'),
       path: '/vault/about',
     },
   ];
@@ -128,7 +128,7 @@ export default function Sidebar() {
               {!isCollapsed && (
                 <div>
                   <h1 className="font-bold text-light-900 dark:text-light-100">PassXYZ</h1>
-                  <p className="text-xs text-light-500 dark:text-dark-400">Vault</p>
+                  <p className="text-xs text-light-500 dark:text-dark-400">{t('common.vault')}</p>
                 </div>
               )}
             </div>

@@ -73,6 +73,8 @@ export const zh = {
     submit: "提交",
     logout: "登出",
     save: "保存",
+    home: "首页",
+    vault: "密码库",
     delete: "删除",
     edit: "编辑",
     close: "关闭",

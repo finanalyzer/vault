@@ -73,6 +73,8 @@ export const en = {
     submit: "Submit",
     logout: "Logout",
     save: "Save",
+    home: "Home",
+    vault: "Vault",
     delete: "Delete",
     edit: "Edit",
     close: "Close",
