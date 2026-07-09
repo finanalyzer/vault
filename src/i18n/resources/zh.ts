@@ -108,6 +108,7 @@ export const zh = {
     otpHint: "基于时间的一次性密码",
     noOtp: "未找到 OTP 条目。",
     otpUrl: "OTP URL",
+    invalidOtpUrl: "无效的 OTP URL，必须以 otpauth:// 开头",
     icons: "图标",
     selectIcon: "为条目选择图标",
     noIcons: "未找到图标。",

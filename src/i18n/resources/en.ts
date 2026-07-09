@@ -108,6 +108,7 @@ export const en = {
     otpHint: "Time-based one-time passwords",
     noOtp: "No OTP entries found.",
     otpUrl: "OTP URL",
+    invalidOtpUrl: "Invalid OTP URL, must start with otpauth://",
     icons: "Icons",
     selectIcon: "Select an icon for your entry",
     noIcons: "No icons found.",

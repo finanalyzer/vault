@@ -7,6 +7,7 @@ import { ItemSubType } from '../types/vault';
 import type { EntryDto } from '../types/vault';
 import type { FieldDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
+import { parseOtpUrl } from '../utils/totp';
 
 export default function FieldEditPage() {
   const params = useParams({ from: '/vault/entries/$entryId/fields' });
@@ -19,6 +20,7 @@ export default function FieldEditPage() {
   const [newFieldKey, setNewFieldKey] = useState('');
   const [newFieldValue, setNewFieldValue] = useState('');
   const [newFieldProtected, setNewFieldProtected] = useState(false);
+  const [newFieldOtp, setNewFieldOtp] = useState(false);
   const [error, setError] = useState<string>('');
   const [notification, setNotification] = useState<string | null>(null);
   const [showProtectedValues, setShowProtectedValues] = useState(false);
@@ -30,6 +32,7 @@ export default function FieldEditPage() {
   const [editEmail, setEditEmail] = useState('');
   const [editMobile, setEditMobile] = useState('');
   const [editNotes, setEditNotes] = useState('');
+  const [editOtpUrl, setEditOtpUrl] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -48,6 +51,7 @@ export default function FieldEditPage() {
       setEditEmail(data.email || '');
       setEditMobile(data.mobile || '');
       setEditNotes(data.notes || '');
+      setEditOtpUrl(data.otpUrl || '');
 
       if (data.fields) {
         setFields(data.fields.filter(f => !f.isBinary));
@@ -69,6 +73,20 @@ export default function FieldEditPage() {
   };
 
   const handleAddField = () => {
+    if (newFieldOtp) {
+      if (!newFieldValue.trim()) return;
+      const parsed = parseOtpUrl(newFieldValue.trim());
+      if (!parsed) {
+        setError(t('common.error') + ': ' + t('common.invalidOtpUrl'));
+        return;
+      }
+      setEditOtpUrl(newFieldValue.trim());
+      setNewFieldValue('');
+      setNewFieldOtp(false);
+      setError('');
+      return;
+    }
+
     if (!newFieldKey.trim()) return;
     const exists = fields.some(f => f.key === newFieldKey.trim());
     if (exists) {
@@ -111,6 +129,7 @@ export default function FieldEditPage() {
         email: editEmail || undefined,
         mobile: editMobile || undefined,
         notes: editNotes || undefined,
+        otpUrl: editOtpUrl,
         fields: fields.length > 0 ? fields : undefined,
       });
 
@@ -310,9 +329,10 @@ export default function FieldEditPage() {
                     <Label>{t('common.key')}</Label>
                     <Input
                       type="text"
-                      value={newFieldKey}
+                      value={newFieldOtp ? t('common.otp') : newFieldKey}
                       onChange={(value) => setNewFieldKey(String(value))}
                       placeholder="Field name"
+                      disabled={newFieldOtp}
                     />
                   </div>
                   <div className="space-y-2">
@@ -321,16 +341,32 @@ export default function FieldEditPage() {
                       type="text"
                       value={newFieldValue}
                       onChange={(value) => setNewFieldValue(String(value))}
-                      placeholder="Field value"
+                      placeholder={newFieldOtp ? 'otpauth://totp/...' : 'Field value'}
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={newFieldProtected}
-                    onCheckedChange={(checked) => setNewFieldProtected(checked as boolean)}
-                  />
-                  <Label>{t('common.protected')}</Label>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={newFieldProtected}
+                      onCheckedChange={(checked) => setNewFieldProtected(checked as boolean)}
+                      disabled={newFieldOtp}
+                    />
+                    <Label>{t('common.protected')}</Label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={newFieldOtp}
+                      onCheckedChange={(checked) => {
+                        setNewFieldOtp(checked as boolean);
+                        if (checked) {
+                          setNewFieldProtected(false);
+                        }
+                      }}
+                      disabled={newFieldProtected}
+                    />
+                    <Label>{t('common.otp')}</Label>
+                  </div>
                 </div>
                 {error && (
                   <p className="text-sm text-danger-500">{error}</p>
@@ -412,14 +448,26 @@ export default function FieldEditPage() {
               )}
             </div>
 
-            {entry.otpUrl && (
-              <div className="mt-6 bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden">
-                <div className="p-6 border-b border-light-200 dark:border-dark-600">
+            {editOtpUrl && (
+              <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-light-5 dark:shadow-dark-5 overflow-hidden mb-6">
+                <div className="p-6 border-b border-light-200 dark:border-dark-600 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-light-900 dark:text-light-100">
                     {t('common.otp')}
                   </h2>
+                  <button
+                    type="button"
+                    onClick={() => setEditOtpUrl('')}
+                    className="p-2 text-light-400 hover:text-danger-500 transition-colors"
+                    title={t('common.delete')}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="p-6">
+                <div className="p-6 space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-success-100 dark:bg-success-900/30 rounded-lg">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-success-600 dark:text-success-400">
@@ -428,11 +476,14 @@ export default function FieldEditPage() {
                         <path d="M9 18H9.01" />
                       </svg>
                     </div>
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-light-500 dark:text-dark-400 uppercase tracking-wider">
-                        {t('common.otpUrl')}
-                      </label>
-                      <span className="text-sm text-light-900 dark:text-light-100 font-mono break-all">{entry.otpUrl}</span>
+                    <div className="flex-1 space-y-2">
+                      <Label>{t('common.otpUrl')}</Label>
+                      <Input
+                        type="text"
+                        value={editOtpUrl}
+                        onChange={(value) => setEditOtpUrl(String(value))}
+                        placeholder="otpauth://totp/..."
+                      />
                     </div>
                   </div>
                 </div>
