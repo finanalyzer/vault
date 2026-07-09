@@ -11,6 +11,7 @@ import type { GroupDto } from '../types/vault';
 import { copyToClipboard } from '../utils/clipboard';
 import Sidebar from '../components/layout/Sidebar';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 export default function ItemDetailPage() {
   const params = useParams({ from: '/vault/entries/$entryId' });
@@ -359,9 +360,7 @@ export default function ItemDetailPage() {
                     <label className="block text-xs font-medium text-light-500 dark:text-dark-400 uppercase tracking-wider mb-2">
                       {t('common.notes')}
                     </label>
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-sm text-light-900 dark:text-light-100 whitespace-pre-wrap">{entry.notes}</p>
-                    </div>
+                    <MarkdownRenderer content={entry.notes} />
                   </div>
                 )}
               </div>
