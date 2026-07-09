@@ -15,7 +15,7 @@ const entrySchema = z.object({
   username: z.string().optional(),
   password: z.string().optional(),
   url: z.string().optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().optional().or(z.literal('')),
   mobile: z.string().optional(),
   notes: z.string().optional(),
 });
