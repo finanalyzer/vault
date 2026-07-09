@@ -3,6 +3,7 @@ import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Label, Checkbox, Textarea } from '@openbb/ui';
 import { getEntry, updateEntry } from '../services/vaultService';
+import { ItemSubType } from '../types/vault';
 import type { EntryDto } from '../types/vault';
 import type { FieldDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -207,77 +208,83 @@ export default function FieldEditPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t('login.username')}</Label>
-                    <Input
-                      type="text"
-                      value={editUsername}
-                      onChange={(value) => setEditUsername(String(value))}
-                      placeholder="username"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t('login.masterPassword')}</Label>
-                    <div className="relative">
+                {entry.type !== ItemSubType.Notes && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('login.username')}</Label>
                       <Input
-                        type={showPassword ? 'text' : 'password'}
-                        value={editPassword}
-                        onChange={(value) => setEditPassword(String(value))}
-                        placeholder="••••••••"
+                        type="text"
+                        value={editUsername}
+                        onChange={(value) => setEditUsername(String(value))}
+                        placeholder="username"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-light-500 dark:text-dark-300 hover:text-light-700 dark:hover:text-light-200 transition-colors"
-                      >
-                        {showPassword ? (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9.87 9.87a3 3 0 1 0 4.26 4.26" />
-                            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c1.09 0 2.16-.16 3.16-.46" />
-                          </svg>
-                        ) : (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        )}
-                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t('login.masterPassword')}</Label>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          value={editPassword}
+                          onChange={(value) => setEditPassword(String(value))}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-light-500 dark:text-dark-300 hover:text-light-700 dark:hover:text-light-200 transition-colors"
+                        >
+                          {showPassword ? (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M9.87 9.87a3 3 0 1 0 4.26 4.26" />
+                              <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                              <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c1.09 0 2.16-.16 3.16-.46" />
+                            </svg>
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {entry.type !== ItemSubType.Notes && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('login.email')}</Label>
+                      <Input
+                        type="email"
+                        value={editEmail}
+                        onChange={(value) => setEditEmail(String(value))}
+                        placeholder="email@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t('common.mobile')}</Label>
+                      <Input
+                        type="tel"
+                        value={editMobile}
+                        onChange={(value) => setEditMobile(String(value))}
+                        placeholder="+1 234 567 8900"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {entry.type !== ItemSubType.Notes && (
                   <div className="space-y-2">
-                    <Label>{t('login.email')}</Label>
+                    <Label>{t('common.url')}</Label>
                     <Input
-                      type="email"
-                      value={editEmail}
-                      onChange={(value) => setEditEmail(String(value))}
-                      placeholder="email@example.com"
+                      type="url"
+                      value={editUrl}
+                      onChange={(value) => setEditUrl(String(value))}
+                      placeholder="https://example.com"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>{t('login.mobile')}</Label>
-                    <Input
-                      type="tel"
-                      value={editMobile}
-                      onChange={(value) => setEditMobile(String(value))}
-                      placeholder="+1 234 567 8900"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{t('login.url')}</Label>
-                  <Input
-                    type="url"
-                    value={editUrl}
-                    onChange={(value) => setEditUrl(String(value))}
-                    placeholder="https://example.com"
-                  />
-                </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>{t('common.notes')}</Label>

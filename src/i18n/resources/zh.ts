@@ -111,6 +111,10 @@ export const zh = {
     key: "键",
     value: "值",
     duplicate: "键重复。",
+    hide: "隐藏",
+    show: "显示",
+    mobile: "手机号",
+    url: "网址",
     settings: "设置",
     settingsHint: "管理账户设置",
     security: "安全",
@@ -143,5 +147,8 @@ export const zh = {
     changeIcon: "更换图标",
     confirmDelete: "确定要删除 '{{name}}' 吗？",
     more: "更多",
+  },
+  validation: {
+    nameRequired: "请输入名称",
   },
 };

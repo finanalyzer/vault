@@ -111,6 +111,10 @@ export const en = {
     key: "Key",
     value: "Value",
     duplicate: "Duplicate key.",
+    hide: "Hide",
+    show: "Show",
+    mobile: "Mobile",
+    url: "URL",
     settings: "Settings",
     settingsHint: "Manage your account settings",
     security: "Security",
@@ -143,5 +147,8 @@ export const en = {
     changeIcon: "Change Icon",
     confirmDelete: "Are you sure you want to delete '{{name}}'?",
     more: "More",
+  },
+  validation: {
+    nameRequired: "Name is required",
   },
 };

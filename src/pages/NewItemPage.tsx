@@ -11,7 +11,7 @@ import Sidebar from '../components/layout/Sidebar';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
 
 const entrySchema = z.object({
-  name: z.string().min(1, { message: 'common.error.nameRequired' }),
+  name: z.string().min(1, { message: 'validation.nameRequired' }),
   username: z.string().optional(),
   password: z.string().optional(),
   url: z.string().optional(),
@@ -21,7 +21,7 @@ const entrySchema = z.object({
 });
 
 const groupSchema = z.object({
-  name: z.string().min(1, { message: 'common.error.nameRequired' }),
+  name: z.string().min(1, { message: 'validation.nameRequired' }),
 });
 
 type EntryFormData = z.infer<typeof entrySchema>;
@@ -113,14 +113,14 @@ export default function NewItemPage() {
   };
 
   const entryTypes = [
-    { value: ItemSubType.Entry, label: 'Entry', icon: (
+    { value: ItemSubType.Entry, label: t('common.entry'), icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
         <line x1="16" y1="5" x2="16" y2="19" />
         <line x1="8" y1="5" x2="8" y2="19" />
       </svg>
     )},
-    { value: ItemSubType.Notes, label: 'Notes', icon: (
+    { value: ItemSubType.Notes, label: t('common.notes'), icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
@@ -226,95 +226,101 @@ export default function NewItemPage() {
 
                 {itemType === 'entry' && (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>{t('login.username')}</Label>
-                        <Controller
-                          name="username"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              type="text"
-                              placeholder="username"
-                              disabled={isLoading}
-                              value={field.value}
-                              onChange={(value) => field.onChange(value)}
-                            />
-                          )}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>{t('login.masterPassword')}</Label>
-                        <Controller
-                          name="password"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              disabled={isLoading}
-                              revealable
-                              value={field.value}
-                              onChange={(value) => field.onChange(value)}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>{t('login.email')}</Label>
-                        <Controller
-                          name="email"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              type="email"
-                              placeholder="email@example.com"
-                              disabled={isLoading}
-                              error={!!(errors as any).email}
-                              message={(errors as any).email?.message ? t((errors as any).email.message as string) : undefined}
-                              value={field.value}
-                              onChange={(value) => field.onChange(value)}
-                            />
-                          )}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>{t('login.mobile')}</Label>
-                        <Controller
-                          name="mobile"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              type="tel"
-                              placeholder="+1 234 567 8900"
-                              disabled={isLoading}
-                              value={field.value}
-                              onChange={(value) => field.onChange(value)}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>{t('login.url')}</Label>
-                      <Controller
-                        name="url"
-                        control={control}
-                        render={({ field }) => (
-                          <Input
-                            type="url"
-                            placeholder="https://example.com"
-                            disabled={isLoading}
-                            value={field.value}
-                            onChange={(value) => field.onChange(value)}
+                    {entrySubType !== ItemSubType.Notes && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>{t('login.username')}</Label>
+                          <Controller
+                            name="username"
+                            control={control}
+                            render={({ field }) => (
+                              <Input
+                                type="text"
+                                placeholder="username"
+                                disabled={isLoading}
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                              />
+                            )}
                           />
-                        )}
-                      />
-                    </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{t('login.masterPassword')}</Label>
+                          <Controller
+                            name="password"
+                            control={control}
+                            render={({ field }) => (
+                              <Input
+                                type="password"
+                                placeholder="••••••••"
+                                disabled={isLoading}
+                                revealable
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {entrySubType !== ItemSubType.Notes && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>{t('login.email')}</Label>
+                          <Controller
+                            name="email"
+                            control={control}
+                            render={({ field }) => (
+                              <Input
+                                type="email"
+                                placeholder="email@example.com"
+                                disabled={isLoading}
+                                error={!!(errors as any).email}
+                                message={(errors as any).email?.message ? t((errors as any).email.message as string) : undefined}
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                              />
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{t('common.mobile')}</Label>
+                          <Controller
+                            name="mobile"
+                            control={control}
+                            render={({ field }) => (
+                              <Input
+                                type="tel"
+                                placeholder="+1 234 567 8900"
+                                disabled={isLoading}
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                              />
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {entrySubType !== ItemSubType.Notes && (
+                      <div className="space-y-2">
+                        <Label>{t('common.url')}</Label>
+                        <Controller
+                          name="url"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              type="url"
+                              placeholder="https://example.com"
+                              disabled={isLoading}
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                            />
+                          )}
+                        />
+                      </div>
+                    )}
 
                     <div className="space-y-2">
                       <Label>{t('common.notes')}</Label>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
 import { getEntry, deleteEntry, getAttachments, downloadAttachment, deleteAttachment, getGroup } from '../services/vaultService';
+import { ItemSubType } from '../types/vault';
 import type { EntryDto } from '../types/vault';
 import type { AttachmentDto } from '../types/vault';
 import type { GroupDto } from '../types/vault';
@@ -256,7 +257,7 @@ export default function ItemDetailPage() {
                 </h2>
               </div>
               <div className="divide-y divide-light-100 dark:divide-dark-700">
-                {fieldItems.map((item) => (
+                {entry.type !== ItemSubType.Notes && fieldItems.map((item) => (
                   <div key={item.label} className="flex items-center gap-4 px-6 py-4 hover:bg-light-50 dark:hover:bg-dark-700">
                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-light-400 dark:text-dark-500">
                       {item.icon || (
@@ -267,7 +268,7 @@ export default function ItemDetailPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-xs font-medium text-light-500 dark:text-dark-400 uppercase tracking-wider">
-                        {t(`login.${item.label}`) || item.label}
+                        {t(`common.${item.label}`)}
                       </label>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-sm text-light-900 dark:text-light-100 truncate">
