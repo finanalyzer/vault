@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
 import { Button } from '@openbb/ui';
 import { getEntry, updateEntry, getGroup } from '../services/vaultService';
 import type { EntryDto } from '../types/vault';
 import type { GroupDto } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
 import Breadcrumbs from '../components/layout/Breadcrumbs';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 export default function NotesPage() {
   const params = useParams({ from: '/vault/notes/$entryId' });
@@ -194,11 +192,7 @@ export default function NotesPage() {
                     autoFocus
                   />
                 ) : entry.notes ? (
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-                      {entry.notes}
-                    </ReactMarkdown>
-                  </div>
+                  <MarkdownRenderer content={entry.notes} />
                 ) : (
                   <div className="text-center py-12">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-light-300 dark:text-dark-500">

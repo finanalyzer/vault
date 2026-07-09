@@ -1,5 +1,6 @@
 import conf from "@openbb/ui/tailwind.config";
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
 
 const light = {
   50: "#f7f8f9",
@@ -118,6 +119,7 @@ export default {
     "./node_modules/@openbb/ui/dist/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [conf],
+  plugins: [typography],
   darkMode: "class",
   theme: {
     extend: {
