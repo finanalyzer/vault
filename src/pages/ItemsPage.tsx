@@ -3,6 +3,7 @@ import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
 import { getItemsByGroup, getGroup, deleteEntry, deleteGroup } from '../services/vaultService';
+import { getUserProfile } from '../services/authService';
 import type { ItemDto } from '../types/vault';
 import { ItemSubType } from '../types/vault';
 import Sidebar from '../components/layout/Sidebar';
@@ -51,11 +52,29 @@ export default function ItemsPage() {
         fetchRootGroup,
       ]);
       setItems(data);
-      setGroupName(group.name);
-      setRootGroupName(rootGroup.name);
+
+      // Decode the root group name if it's base58-encoded
+      let decodedRootName = rootGroup.name;
+      if (rootGroup.name.startsWith('pass_')) {
+        try {
+          const profile = await getUserProfile();
+          decodedRootName = profile.username;
+        } catch {
+          // keep encoded value on failure
+        }
+      }
+
+      // When viewing the root group itself, groupName should also use the decoded name
+      if (group.id === rootGroup.id) {
+        setGroupName(decodedRootName);
+      } else {
+        setGroupName(group.name);
+      }
+
+      setRootGroupName(decodedRootName);
       setRootGroupId(rootGroup.id);
       
-      if (groupId !== 'root' && group.parentId && group.parentId !== rootGroup.id) {
+      if (group.id !== rootGroup.id && group.parentId && group.parentId !== rootGroup.id) {
         const parent = await getGroup(group.parentId);
         setParentGroup({ id: parent.id, name: parent.name });
       } else {

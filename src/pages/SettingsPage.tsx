@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Select, Checkbox } from '@openbb/ui';
-import { getUserProfile, updateProfile } from '../services/authService';
+import { getUserProfile } from '../services/authService';
 import { changePassword } from '../services/vaultService';
 
 import Sidebar from '../components/layout/Sidebar';
@@ -55,18 +55,6 @@ export default function SettingsPage() {
     } catch {
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleUpdateDeviceLock = async () => {
-    try {
-      await updateProfile({ isDeviceLockEnabled: !isDeviceLockEnabled });
-      setIsDeviceLockEnabled(!isDeviceLockEnabled);
-      setNotification({ type: 'success', message: t('common.save') + ' ' + t('common.success') });
-    } catch {
-      setNotification({ type: 'error', message: t('common.error') });
-    } finally {
-      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -168,10 +156,7 @@ export default function SettingsPage() {
                     </div>
                     <Checkbox
                       checked={isDeviceLockEnabled}
-                      onCheckedChange={(checked) => {
-                        setIsDeviceLockEnabled(checked as boolean);
-                        handleUpdateDeviceLock();
-                      }}
+                      disabled
                     />
                   </div>
 

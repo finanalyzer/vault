@@ -3,6 +3,7 @@ import { useParams, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@openbb/ui';
 import { getEntry, deleteEntry, getAttachments, downloadAttachment, deleteAttachment, uploadAttachment, getGroup } from '../services/vaultService';
+import { getUserProfile } from '../services/authService';
 import { ItemSubType } from '../types/vault';
 import type { EntryDto } from '../types/vault';
 import type { AttachmentDto } from '../types/vault';
@@ -62,10 +63,21 @@ export default function ItemDetailPage() {
       if (data.groupId) {
         setGroupId(data.groupId);
         const group = await getGroup(data.groupId);
-        setGroupName(group.name);
-        
+
         const rootGroup = await getGroup('root');
         setRootGroupId(rootGroup.id);
+
+        // Decode groupName if this entry is directly in the root group
+        if (group.id === rootGroup.id && group.name.startsWith('pass_')) {
+          try {
+            const profile = await getUserProfile();
+            setGroupName(profile.username);
+          } catch {
+            setGroupName(group.name);
+          }
+        } else {
+          setGroupName(group.name);
+        }
         
         if (group.parentId && group.parentId !== rootGroup.id) {
           const parent = await getGroup(group.parentId);
@@ -93,7 +105,16 @@ export default function ItemDetailPage() {
   const loadRootGroupName = async () => {
     try {
       const rootGroup: GroupDto = await getGroup('root');
-      setRootGroupName(rootGroup.name);
+      if (rootGroup.name.startsWith('pass_')) {
+        try {
+          const profile = await getUserProfile();
+          setRootGroupName(profile.username);
+        } catch {
+          setRootGroupName(rootGroup.name);
+        }
+      } else {
+        setRootGroupName(rootGroup.name);
+      }
     } catch {
       setRootGroupName('Root');
     }
