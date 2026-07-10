@@ -95,7 +95,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <div className="w-24 h-24 bg-gradient-to-br from-brand-main to-brand-darker rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <img src={`${import.meta.env.BASE_URL}passxyz.svg`} alt="PassXYZ" className="w-14 h-14 object-contain" />
+                <img src={`${import.meta.env.BASE_URL}/passxyz.svg`} alt="PassXYZ" className="w-14 h-14 object-contain" />
               </div>
               <h2 className="text-3xl font-bold text-light-900 dark:text-light-100">
                 PassXYZ Vault

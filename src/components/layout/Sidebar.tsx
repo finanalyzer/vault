@@ -123,7 +123,7 @@ export default function Sidebar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-brand-main to-brand-darker rounded-xl flex items-center justify-center flex-shrink-0">
-                <img src={`${import.meta.env.BASE_URL}passxyz.svg`} alt="PassXYZ" className="w-6 h-6 object-contain" />
+                <img src={`${import.meta.env.BASE_URL}/passxyz.svg`} alt="PassXYZ" className="w-6 h-6 object-contain" />
               </div>
               {!isCollapsed && (
                 <div>

@@ -16,7 +16,7 @@ export default function LoginPage() {
           <div className="p-8 sm:p-10">
             <div className="flex flex-col items-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-brand-main to-brand-darker rounded-xl flex items-center justify-center mb-4">
-                <img src={`${import.meta.env.BASE_URL}passxyz.svg`} alt="PassXYZ" className="w-10 h-10 object-contain" />
+                <img src={`${import.meta.env.BASE_URL}/passxyz.svg`} alt="PassXYZ" className="w-10 h-10 object-contain" />
               </div>
               <h1 className="text-2xl font-bold text-light-900 dark:text-light-100">
                 {t('login.title')}
