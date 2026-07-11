@@ -3,6 +3,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 
+interface MenuItem {
+  icon: React.ReactNode;
+  label: string;
+  path: string;
+  external?: boolean;
+}
+
 export default function Sidebar() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -35,7 +42,7 @@ export default function Sidebar() {
     };
   }, [isMobileMenuOpen]);
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -72,6 +79,7 @@ export default function Sidebar() {
       ),
       label: t('common.finanalyzer'),
       path: '/app/',
+      external: true,
     },
     {
       icon: (
@@ -103,6 +111,13 @@ export default function Sidebar() {
   const handleMenuClick = (path: string) => {
     navigate({ to: path });
     setIsMobileMenuOpen(false);
+  };
+
+  const isActive = (path: string, external?: boolean) => {
+    if (external) {
+      return false;
+    }
+    return window.location.pathname.startsWith(path);
   };
 
   return (
@@ -153,22 +168,42 @@ export default function Sidebar() {
 
         <nav className="flex-1 py-4">
           <ul className="space-y-1 px-3">
-            {menuItems.map((item) => (
-              <li key={item.label}>
-                <button
-                  onClick={() => handleMenuClick(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-                    window.location.pathname.startsWith(item.path)
-                      ? 'bg-brand-main/10 text-brand-main'
-                      : 'text-light-600 dark:text-light-300 hover:bg-light-100 dark:hover:bg-dark-700'
-                  }`}
-                  title={isCollapsed ? item.label : undefined}
-                >
-                  <span className="flex-shrink-0">{item.icon}</span>
-                  {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-                </button>
-              </li>
-            ))}
+            {menuItems.map((item) => {
+              if (item.external) {
+                return (
+                  <li key={item.label}>
+                    <a
+                      href={`${window.location.origin}${item.path}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                        isActive(item.path, item.external)
+                          ? 'bg-brand-main/10 text-brand-main'
+                          : 'text-light-600 dark:text-light-300 hover:bg-light-100 dark:hover:bg-dark-700'
+                      }`}
+                      title={isCollapsed ? item.label : undefined}
+                    >
+                      <span className="flex-shrink-0">{item.icon}</span>
+                      {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
+                    </a>
+                  </li>
+                );
+              }
+              return (
+                <li key={item.label}>
+                  <button
+                    onClick={() => handleMenuClick(item.path)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? 'bg-brand-main/10 text-brand-main'
+                        : 'text-light-600 dark:text-light-300 hover:bg-light-100 dark:hover:bg-dark-700'
+                    }`}
+                    title={isCollapsed ? item.label : undefined}
+                  >
+                    <span className="flex-shrink-0">{item.icon}</span>
+                    {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
