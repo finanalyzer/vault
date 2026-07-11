@@ -154,6 +154,7 @@ export const zh = {
     changeIcon: "更换图标",
     confirmDelete: "确定要删除 '{{name}}' 吗？",
     more: "更多",
+    finanalyzer: "Finanalyzer",
   },
   validation: {
     nameRequired: "请输入名称",

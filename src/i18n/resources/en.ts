@@ -154,6 +154,7 @@ export const en = {
     changeIcon: "Change Icon",
     confirmDelete: "Are you sure you want to delete '{{name}}'?",
     more: "More",
+    finanalyzer: "Finanalyzer",
   },
   validation: {
     nameRequired: "Name is required",
