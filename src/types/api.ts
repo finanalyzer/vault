@@ -1,5 +1,6 @@
 export interface LoginRequest {
   username: string;
+  email?: string;
   masterPassword: string;
   takeOver?: boolean;
   deviceInfo?: string;

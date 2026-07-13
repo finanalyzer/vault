@@ -4,6 +4,7 @@ export const en = {
     subtitle: "Secure password management",
     email: "Email",
     username: "Username",
+    usernameOrEmail: "Username or Email",
     masterPassword: "Master Password",
     rememberMe: "Remember me",
     forgotPassword: "Forgot password?",

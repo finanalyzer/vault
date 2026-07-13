@@ -10,7 +10,7 @@ import type { SessionConflictResponse } from '../types/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const loginSchema = z.object({
-  username: z
+  identifier: z
     .string()
     .min(1, { message: 'login.error.usernameRequired' })
     .min(3, { message: 'login.error.usernameMinLength' }),
@@ -26,6 +26,10 @@ interface LoginFormProps {
   initialUsername?: string;
 }
 
+const isEmail = (input: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+};
+
 export default function LoginForm({ initialUsername }: LoginFormProps) {
   const { t } = useTranslation();
   const { login: authLogin } = useAuth();
@@ -38,14 +42,14 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: initialUsername || '',
+      identifier: initialUsername || '',
       masterPassword: '',
     },
   });
 
   useEffect(() => {
     if (initialUsername) {
-      form.setValue('username', initialUsername);
+      form.setValue('identifier', initialUsername);
     }
   }, [initialUsername, form]);
 
@@ -54,7 +58,7 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
     if (cloudflareEmail && !initialUsername) {
       getUserByEmail(cloudflareEmail).then(user => {
         if (user) {
-          form.setValue('username', user.username);
+          form.setValue('identifier', user.username);
         } else {
           navigate({ to: '/signup', search: { email: cloudflareEmail } });
         }
@@ -67,8 +71,13 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
     setLoginError('');
 
     try {
+      const identifier = data.identifier;
+      const email = isEmail(identifier) ? identifier : undefined;
+      const username = isEmail(identifier) ? '' : identifier;
+
       const response = await login({
-        username: data.username,
+        username,
+        email,
         masterPassword: data.masterPassword,
         deviceInfo: `${navigator.userAgent}`,
       });
@@ -92,8 +101,13 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
 
     setIsLoading(true);
     try {
+      const identifier = form.getValues('identifier');
+      const email = isEmail(identifier) ? identifier : undefined;
+      const username = isEmail(identifier) ? '' : identifier;
+
       const response = await login({
-        username: form.getValues('username'),
+        username,
+        email,
         masterPassword: form.getValues('masterPassword'),
         takeOver: true,
         deviceInfo: `${navigator.userAgent}`,
@@ -114,12 +128,12 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="username"
+            name="identifier"
             render={({ field, fieldState }) => (
               <FormInput
                 {...field}
-                label={t('login.username')}
-                placeholder="username"
+                label={t('login.usernameOrEmail')}
+                placeholder="username or email"
                 disabled={isLoading}
                 error={!!fieldState.error}
                 message={fieldState.error?.message ? t(fieldState.error.message) : undefined}

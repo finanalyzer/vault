@@ -4,6 +4,7 @@ export const zh = {
     subtitle: "安全的密码管理",
     email: "邮箱",
     username: "用户名",
+    usernameOrEmail: "用户名或邮箱",
     masterPassword: "主密码",
     rememberMe: "记住我",
     forgotPassword: "忘记密码？",

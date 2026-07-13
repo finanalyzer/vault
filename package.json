@@ -1,8 +1,8 @@
 {
   "name": "passxyz-web",
   "private": true,
-  "version": "0.1.6-dev",
-  "description": "PassXYZ.Web - 密码管理前端应用",
+  "version": "1.0.0",
+  "description": "PassXYZ Vault 3 - 密码管理前端应用",
   "type": "module",
   "scripts": {
     "dev": "vite",
