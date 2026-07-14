@@ -105,7 +105,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate({ to: '/login' });
+    navigate({ to: '/login', search: { username: '' } });
   };
 
   const handleMenuClick = (path: string) => {

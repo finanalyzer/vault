@@ -85,7 +85,7 @@ export default function UsersPage() {
                   {t('users.subtitle')}
                 </p>
               </div>
-              <Button variant="primary" onClick={() => navigate({ to: '/signup' })}>
+              <Button variant="primary" onClick={() => navigate({ to: '/signup', search: { email: '' } })}>
                 {t('common.add')}
               </Button>
             </div>

@@ -43,7 +43,7 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      identifier: initialUsername || '',
+      identifier: initialUsername || localStorage.getItem('cf-email') || '',
       masterPassword: '',
     },
   });

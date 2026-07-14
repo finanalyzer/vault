@@ -15,6 +15,37 @@ export function getCloudflareJwt(): string | null {
   return getCookie(CLOUDFLARE_JWT_COOKIE_NAME);
 }
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = parts[1];
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+export function getCloudflareEmail(): string | null {
+  // First check localStorage (set by x-user-email response header)
+  const stored = localStorage.getItem('cf-email');
+  if (stored) return stored;
+
+  // Fallback: decode the CF_Authorization JWT to extract email
+  const jwt = getCloudflareJwt();
+  if (!jwt) return null;
+
+  const payload = decodeJwtPayload(jwt);
+  if (!payload) return null;
+
+  const email = (payload.email || payload.sub) as string | undefined;
+  if (email) {
+    localStorage.setItem('cf-email', email);
+  }
+  return email ?? null;
+}
+
 export function clearCloudflareEmail(): void {
   localStorage.removeItem('cf-email');
 }

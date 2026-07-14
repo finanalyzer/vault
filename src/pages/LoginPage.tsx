@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@openbb/ui';
 import LoginForm from '../components/LoginForm';
@@ -6,8 +6,8 @@ import LoginForm from '../components/LoginForm';
 export default function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const searchParams = new URLSearchParams(window.location.search);
-  const initialUsername = searchParams.get('username') || undefined;
+  const { username: searchUsername } = useSearch({ from: '/login' });
+  const initialUsername = searchUsername || undefined;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-light-100 to-light-200 dark:from-dark-900 dark:to-dark-800">
@@ -32,7 +32,7 @@ export default function LoginPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => navigate({ to: '/signup' })}
+                onClick={() => navigate({ to: '/signup', search: { email: '' } })}
               >
                 {t('signup.alreadyHaveAccount')} {t('signup.login')}
               </Button>

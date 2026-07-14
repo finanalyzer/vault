@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Label, Checkbox } from '@openbb/ui';
 import { signUp } from '../services/authService';
+import { getCloudflareEmail } from '../services/apiClient';
 
 const signupSchema = z.object({
   username: z
@@ -37,8 +38,9 @@ export default function SignUpPage() {
   const [signupError, setSignupError] = useState<string>('');
   const [isDeviceLockEnabled, setIsDeviceLockEnabled] = useState(false);
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const initialEmail = searchParams.get('email') || '';
+  const { email: searchEmail } = useSearch({ from: '/signup' });
+  const cfEmail = getCloudflareEmail();
+  const initialEmail = searchEmail || cfEmail || '';
 
   const {
     handleSubmit,
@@ -213,7 +215,7 @@ export default function SignUpPage() {
             <div className="mt-6 text-center">
               <Button
                 variant="link"
-                onClick={() => navigate({ to: '/login' })}
+                onClick={() => navigate({ to: '/login', search: { username: '' } })}
               >
                 {t('signup.alreadyHaveAccount')} {t('signup.login')}
               </Button>
