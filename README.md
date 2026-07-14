@@ -277,6 +277,62 @@ pnpm run build:static
 - No development server
 - Sourcemaps disabled
 
+The static build is automatically deployed to `https://finanalyzer.github.io/vault/` via the GitHub Actions workflow defined in `.github/workflows/deploy-static.yml`.
+
+#### GitHub Actions CI/CD
+
+The workflow triggers on pushes to the `main` branch and can also be triggered manually via `workflow_dispatch`.
+
+**Workflow Steps:**
+
+1. **Checkout** – pulls the latest source code
+2. **Setup pnpm** – installs the pnpm package manager (v10)
+3. **Setup Node.js** – configures Node.js 20.x with pnpm cache
+4. **Install dependencies** – runs `pnpm install`
+5. **Create .env file** – writes build-time environment variables from GitHub Secrets
+6. **Build static assets** – runs `pnpm run build:static` (TypeScript compilation + Vite static build)
+7. **Deploy to GitHub Pages** – publishes `dist-static/` to the `gh-pages` branch using `peaceiris/actions-gh-pages@v4`
+
+**Required GitHub Secrets:**
+
+| Secret               | Description                                                | Example Value    |
+| -------------------- | ---------------------------------------------------------- | ---------------- |
+| `VITE_API_BASE_URL`  | Base URL path for API requests (relative to the deployed origin) | `/api`           |
+| `VITE_APP_TITLE`     | Application title displayed in the browser tab             | `PassXYZ`        |
+| `VITE_APP_HOST`      | Comma-separated list of allowed Cloudflare Access hostnames | `dev.passxyz.org,dashboard.passxyz.org,pro.passxyz.org` |
+
+**Hardcoded Environment Variables:**
+
+| Variable        | Value    | Description                                          |
+| --------------- | -------- | ---------------------------------------------------- |
+| `VITE_APP_BASE` | `/vault/` | Base path for routing and asset references (hardcoded in the workflow to ensure correct deployment to `/vault/`) |
+
+> **Note:** `VITE_APP_BASE` is set to `/vault/` directly in the workflow to match the target deployment URL `https://finanalyzer.github.io/vault/`. The `VITE_APP_TITLE`, `VITE_API_BASE_URL`, and `VITE_APP_HOST` values can be configured as GitHub Repository Secrets or alternatively set as plain values in the workflow file if they do not contain sensitive information.
+
+**Build Output:**
+
+- Output directory: `dist-static/`
+- Sourcemaps: disabled (production optimization)
+- Routing: hash-based history (compatible with GitHub Pages static hosting)
+- Asset base path: `/vault/`
+
+**Setting Up Secrets:**
+
+1. Go to your GitHub repository: `https://github.com/finanalyzer/vault`
+2. Navigate to **Settings** > **Secrets and variables** > **Actions**
+3. Click **New repository secret** and add each of the required secrets listed above
+
+**Enabling GitHub Pages:**
+
+The workflow uses `peaceiris/actions-gh-pages@v4` which creates and manages the `gh-pages` branch automatically. Ensure GitHub Pages is configured in repository settings:
+
+1. Go to **Settings** > **Pages**
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**
+3. Select the `gh-pages` branch and `/ (root)` directory
+4. Click **Save**
+
+After the first successful workflow run, the site will be available at `https://finanalyzer.github.io/vault/`.
+
 ### CORS Configuration
 
 PassXYZ.Server supports CORS configuration via `appsettings.json`:
