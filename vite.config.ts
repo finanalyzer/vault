@@ -50,6 +50,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/app": {
+        target: "http://localhost:5174",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   resolve: {
