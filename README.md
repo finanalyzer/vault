@@ -297,9 +297,16 @@ The workflow triggers on pushes to the `main` branch and can also be triggered m
 
 | Secret               | Description                                                | Example Value    |
 | -------------------- | ---------------------------------------------------------- | ---------------- |
-| `VITE_API_BASE_URL`  | Base URL path for API requests (relative to the deployed origin) | `/api`           |
+| `VITE_API_BASE_URL`  | Base URL for API requests. Set to an absolute URL (e.g. `http://localhost:5182`) to point to a custom backend, or a relative path (e.g. `/api`) for same-origin proxying. | `/api`           |
 | `VITE_APP_TITLE`     | Application title displayed in the browser tab             | `PassXYZ`        |
 | `VITE_APP_HOST`      | Comma-separated list of allowed Cloudflare Access hostnames | `dev.passxyz.org,dashboard.passxyz.org,pro.passxyz.org` |
+| `VITE_DEMO_MODE`     | Set to `true` to enable mock API mode (uses `/api/mock` endpoints). Leave empty or unset for production mode. | `true`           |
+
+**How `VITE_API_BASE_URL` affects API routing:**
+
+- When set: the value is used directly as the axios `baseURL` (e.g. `http://localhost:5182` → requests go to `http://localhost:5182/api/...`)
+- When unset and `VITE_DEMO_MODE=true`: uses `/api/mock` (mock endpoints)
+- When unset and `VITE_DEMO_MODE` is not `true`: uses `/api` (same-origin relative path)
 
 **Hardcoded Environment Variables:**
 

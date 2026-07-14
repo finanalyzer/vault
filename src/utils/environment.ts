@@ -1,8 +1,12 @@
 export function isDemoMode(): boolean {
-  return window.location.hostname === 'finanalyzer.github.io';
+  return import.meta.env.VITE_DEMO_MODE === 'true';
 }
 
 export function getApiBaseUrl(): string {
+  const configuredUrl = import.meta.env.VITE_API_BASE_URL;
+  if (configuredUrl) {
+    return configuredUrl;
+  }
   if (isDemoMode()) {
     return '/api/mock';
   }

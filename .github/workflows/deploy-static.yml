@@ -43,6 +43,7 @@ jobs:
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
           echo "VITE_APP_TITLE=${{ secrets.VITE_APP_TITLE }}" >> .env
           echo "VITE_APP_HOST=${{ secrets.VITE_APP_HOST }}" >> .env
+          echo "VITE_DEMO_MODE=${{ secrets.VITE_DEMO_MODE }}" >> .env
           echo "VITE_APP_BASE=/vault/" >> .env
           echo "=== .env file contents ==="
           cat .env
@@ -54,6 +55,7 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
           VITE_APP_TITLE: ${{ secrets.VITE_APP_TITLE }}
           VITE_APP_HOST: ${{ secrets.VITE_APP_HOST }}
+          VITE_DEMO_MODE: ${{ secrets.VITE_DEMO_MODE }}
           VITE_APP_BASE: "/vault/"
 
       - name: Deploy to GitHub Pages
