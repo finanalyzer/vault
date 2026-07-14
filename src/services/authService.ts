@@ -1,10 +1,12 @@
-import apiClient from './apiClient';
+import apiClient, { getCloudflareJwt, clearCloudflareEmail } from './apiClient';
 import type { LoginRequest } from '../types/api';
 import type { LoginResponse } from '../types/api';
 import type { UserProfileDto } from '../types/api';
 import type { SignUpRequest } from '../types/api';
 
 import type { UpdateProfileRequest } from '../types/api';
+
+export { getCloudflareJwt, clearCloudflareEmail };
 
 export async function login(request: LoginRequest): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>('/user/login', request);

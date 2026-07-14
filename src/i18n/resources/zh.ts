@@ -19,8 +19,13 @@ export const zh = {
       passwordRequired: "请输入主密码",
       passwordMinLength: "主密码长度至少为8个字符",
       loginFailed: "登录失败，请检查您的凭据。",
+      invalidCloudflareJwt: "您的 Cloudflare 会话已过期，请重新认证。",
+      emailNotVerified: "邮箱未验证，请完成 Cloudflare 验证。",
     },
     success: "登录成功！",
+    cloudflareVerifying: "正在验证 Cloudflare 身份...",
+    cloudflareVerified: "Cloudflare 已验证",
+    cloudflareEmail: "登录账号：{{email}}",
     sessionConflict: {
       title: "会话冲突",
       message: "另一台设备正在使用您的账户登录。",

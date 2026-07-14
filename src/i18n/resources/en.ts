@@ -19,8 +19,13 @@ export const en = {
       passwordRequired: "Master password is required",
       passwordMinLength: "Master password must be at least 8 characters",
       loginFailed: "Login failed. Please check your credentials.",
+      invalidCloudflareJwt: "Your Cloudflare session has expired. Please re-authenticate.",
+      emailNotVerified: "Email not verified. Please complete Cloudflare verification.",
     },
     success: "Login successful!",
+    cloudflareVerifying: "Verifying Cloudflare identity...",
+    cloudflareVerified: "Cloudflare Verified",
+    cloudflareEmail: "Logged in as {{email}}",
     sessionConflict: {
       title: "Session Conflict",
       message: "Another device is logged in with your account.",

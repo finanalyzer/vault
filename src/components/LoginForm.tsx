@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Form, FormField, FormInput, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@openbb/ui';
+import { Button, Form, FormField, FormInput, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, Tag } from '@openbb/ui';
 import { login, getUserByEmail } from '../services/authService';
 import type { SessionConflictResponse } from '../types/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -32,12 +32,13 @@ const isEmail = (input: string): boolean => {
 
 export default function LoginForm({ initialUsername }: LoginFormProps) {
   const { t } = useTranslation();
-  const { login: authLogin } = useAuth();
+  const { login: authLogin, cloudflareVerified, cloudflareEmail } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [conflictData, setConflictData] = useState<SessionConflictResponse | null>(null);
+  const [isCloudflareLoading, setIsCloudflareLoading] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -56,12 +57,16 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
   useEffect(() => {
     const cloudflareEmail = localStorage.getItem('cf-email');
     if (cloudflareEmail && !initialUsername) {
+      setIsCloudflareLoading(true);
       getUserByEmail(cloudflareEmail).then(user => {
+        setIsCloudflareLoading(false);
         if (user) {
           form.setValue('identifier', user.username);
         } else {
           navigate({ to: '/signup', search: { email: cloudflareEmail } });
         }
+      }).catch(() => {
+        setIsCloudflareLoading(false);
       });
     }
   }, [initialUsername, form, navigate]);
@@ -88,6 +93,15 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
       if (error.response?.status === 409) {
         setConflictData(error.response.data);
         setShowConflictModal(true);
+      } else if (error.response?.status === 401) {
+        const errorCode = error.response.data?.error_code;
+        if (errorCode === 'INVALID_CLOUDFLARE_JWT') {
+          setLoginError(t('login.error.invalidCloudflareJwt'));
+        } else if (errorCode === 'EMAIL_NOT_VERIFIED') {
+          setLoginError(t('login.error.emailNotVerified'));
+        } else {
+          setLoginError(t('login.error.loginFailed'));
+        }
       } else {
         setLoginError(t('login.error.loginFailed'));
       }
@@ -124,6 +138,24 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
 
   return (
     <>
+      <div className="mb-4">
+        {isCloudflareLoading ? (
+          <div className="flex items-center gap-2 text-sm text-light-500 dark:text-dark-400">
+            <div className="w-4 h-4 border-2 border-brand-main border-t-transparent rounded-full animate-spin"></div>
+            {t('login.cloudflareVerifying')}
+          </div>
+        ) : cloudflareVerified && cloudflareEmail ? (
+          <div className="flex items-center gap-2">
+            <Tag variant="success" className="text-xs">
+              {t('login.cloudflareVerified')}
+            </Tag>
+            <span className="text-xs text-light-500 dark:text-dark-400">
+              {t('login.cloudflareEmail', { email: cloudflareEmail })}
+            </span>
+          </div>
+        ) : null}
+      </div>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -134,7 +166,7 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
                 {...field}
                 label={t('login.usernameOrEmail')}
                 placeholder="username or email"
-                disabled={isLoading}
+                disabled={isLoading || isCloudflareLoading}
                 error={!!fieldState.error}
                 message={fieldState.error?.message ? t(fieldState.error.message) : undefined}
               />
@@ -150,7 +182,7 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
                 type="password"
                 label={t('login.masterPassword')}
                 placeholder="••••••••"
-                disabled={isLoading}
+                disabled={isLoading || isCloudflareLoading}
                 revealable
                 error={!!fieldState.error}
                 message={fieldState.error?.message ? t(fieldState.error.message) : undefined}
@@ -169,10 +201,10 @@ export default function LoginForm({ initialUsername }: LoginFormProps) {
             variant="primary"
             size="lg"
             className="w-full"
-            loading={isLoading}
-            disabled={isLoading}
+            loading={isLoading || isCloudflareLoading}
+            disabled={isLoading || isCloudflareLoading}
           >
-            {isLoading ? t('login.loading') : t('login.login')}
+            {isCloudflareLoading ? t('login.cloudflareVerifying') : isLoading ? t('login.loading') : t('login.login')}
           </Button>
         </form>
       </Form>

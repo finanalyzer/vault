@@ -48,3 +48,10 @@ export interface UpdateProfileRequest {
 export interface ChangePasswordRequest {
   newPassword: string;
 }
+
+export type AuthState = 
+  | 'unauthenticated'
+  | 'cloudflare_verified'
+  | 'password_required'
+  | 'authenticated'
+  | 'session_conflict';
