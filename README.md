@@ -287,7 +287,7 @@ The workflow triggers on pushes to the `main` branch and can also be triggered m
 
 1. **Checkout** – pulls the latest source code
 2. **Setup pnpm** – installs the pnpm package manager (v10)
-3. **Setup Node.js** – configures Node.js 20.x with pnpm cache
+3. **Setup Node.js** – configures Node.js 24.x with pnpm cache
 4. **Install dependencies** – runs `pnpm install`
 5. **Create .env file** – writes build-time environment variables from GitHub Secrets
 6. **Build static assets** – runs `pnpm run build:static` (TypeScript compilation + Vite static build)
