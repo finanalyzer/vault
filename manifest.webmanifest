@@ -1,0 +1,16 @@
+{
+  "name": "PassXYZ Vault",
+  "short_name": "PassXYZ",
+  "description": "Secure password management",
+  "start_url": "/vault/",
+  "display": "standalone",
+  "background_color": "#151518",
+  "theme_color": "#0088CC",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
